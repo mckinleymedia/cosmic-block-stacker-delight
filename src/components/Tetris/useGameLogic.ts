@@ -46,7 +46,8 @@ type GameAction =
   | 'DOWN' 
   | 'ROTATE' 
   | 'PAUSE' 
-  | 'RESTART';
+  | 'RESTART'
+  | 'QUIT';
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -288,6 +289,26 @@ export const useGameLogic = () => {
     initializeGame();
   }, [initializeGame]);
 
+  // Quit game - reset to initial state with isPaused = true
+  const quitGame = useCallback(() => {
+    const initialBoard = Array(BOARD_HEIGHT).fill(null).map(() => 
+      Array(BOARD_WIDTH).fill(null).map(() => ({ filled: false, color: '' }))
+    );
+    
+    const nextType = randomTetromino();
+    
+    setGameState({
+      board: initialBoard,
+      activeTetromino: null,
+      nextTetromino: nextType,
+      score: 0,
+      level: 1,
+      linesCleared: 0,
+      gameOver: false,
+      isPaused: true
+    });
+  }, []);
+
   // Handle game actions
   const handleGameAction = useCallback((action: GameAction) => {
     switch (action) {
@@ -309,10 +330,13 @@ export const useGameLogic = () => {
       case 'RESTART':
         restartGame();
         break;
+      case 'QUIT':
+        quitGame();
+        break;
       default:
         break;
     }
-  }, [moveTetromino, rotatePiece, togglePause, restartGame]);
+  }, [moveTetromino, rotatePiece, togglePause, restartGame, quitGame]);
 
   // Game loop - CRITICAL FIX
   useEffect(() => {
@@ -409,6 +433,10 @@ export const useGameLogic = () => {
         case 'r':
         case 'R':
           handleGameAction('RESTART');
+          break;
+        case 'q':
+        case 'Q':
+          handleGameAction('QUIT');
           break;
         default:
           break;

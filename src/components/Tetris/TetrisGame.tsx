@@ -20,6 +20,10 @@ const TetrisGame: React.FC = () => {
   // Check if a game has been played (score > 0 or lines > 0)
   const gameHasBeenPlayed = gameState.score > 0 || gameState.linesCleared > 0 || gameState.activeTetromino !== null;
   
+  const handleQuit = useCallback(() => {
+    handleGameAction('QUIT');
+  }, [handleGameAction]);
+  
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
       <GameBoard 
@@ -27,6 +31,7 @@ const TetrisGame: React.FC = () => {
         activeTetromino={gameHasBeenPlayed ? gameState.activeTetromino : null}
         gameOver={showGameOver} 
         isPaused={gameState.isPaused && gameHasStarted && !gameState.gameOver}
+        onQuit={handleQuit}
       />
       
       <div className="flex flex-col gap-4 w-full md:w-64">

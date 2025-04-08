@@ -3,19 +3,23 @@ import React from 'react';
 import { Cell, ActiveTetromino } from './useGameLogic';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
+import { Button } from '@/components/ui/button';
+import { PowerOff } from 'lucide-react';
 
 interface GameBoardProps {
   board: Cell[][];
   activeTetromino: ActiveTetromino | null;
   gameOver: boolean;
   isPaused: boolean;
+  onQuit?: () => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ 
   board, 
   activeTetromino, 
   gameOver,
-  isPaused
+  isPaused,
+  onQuit
 }) => {
   // Create a copy of the board to render the active tetromino
   const renderBoard = JSON.parse(JSON.stringify(board));
@@ -71,6 +75,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <p className="text-xl font-bold text-white mb-2">
             {gameOver ? "GAME OVER" : "GAME PAUSED"}
           </p>
+          
+          {isPaused && !gameOver && onQuit && (
+            <Button 
+              variant="outline" 
+              onClick={onQuit}
+              className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0 flex items-center gap-1"
+            >
+              <PowerOff className="h-4 w-4" />
+              <span>Quit</span>
+            </Button>
+          )}
         </div>
       )}
     </div>
