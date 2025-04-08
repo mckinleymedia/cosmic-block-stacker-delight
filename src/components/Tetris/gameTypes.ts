@@ -37,3 +37,12 @@ export type GameAction =
   | 'PAUSE' 
   | 'RESTART'
   | 'QUIT';
+
+export type LeaderboardEntry = {
+  id: string;
+  playerName: string;
+  score: number;
+  level: number;
+  linesCleared: number;
+  date: string;
+};
