@@ -15,13 +15,28 @@ const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece }) => {
   
   // If showing the piece, center it in the 4x4 grid
   if (showPiece) {
-    // Get the dimensions of the tetromino shape
-    const shapeHeight = tetromino.shape.length;
-    const shapeWidth = Math.max(...tetromino.shape.map(row => row.length));
+    // Find the actual dimensions of the tetromino (trim empty columns)
+    const rows = tetromino.shape;
+    
+    // Find the width of each row (excluding trailing zeros)
+    const effectiveWidths = rows.map(row => {
+      let lastFilledIndex = -1;
+      for (let i = row.length - 1; i >= 0; i--) {
+        if (row[i] !== 0) {
+          lastFilledIndex = i;
+          break;
+        }
+      }
+      return lastFilledIndex + 1; // +1 because it's an index
+    });
+    
+    // Use the maximum effective width
+    const effectiveWidth = Math.max(...effectiveWidths.filter(w => w > 0));
+    const shapeHeight = rows.length;
     
     // Calculate offsets to center the shape in the 4x4 display grid
     const rowOffset = Math.floor((4 - shapeHeight) / 2);
-    const colOffset = Math.floor((4 - shapeWidth) / 2);
+    const colOffset = Math.floor((4 - effectiveWidth) / 2);
     
     // Place the tetromino in the center of the display grid
     for (let row = 0; row < shapeHeight; row++) {
