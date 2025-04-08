@@ -43,9 +43,9 @@ const TetrisGame: React.FC = () => {
           <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
             <Button 
               onClick={() => handleGameAction('START')} 
-              className="bg-green-600 hover:bg-green-700 mb-2 w-full py-8 flex flex-col items-center pt-20"
+              className="bg-green-600 hover:bg-green-700 mb-2 w-full p-6 flex flex-col items-center justify-center min-h-48"
             >
-              <Play className="mb-6 w-32 h-32" />
+              <Play className="mb-6 w-40 h-40" strokeWidth={1.5} />
               Start Game
             </Button>
             <p className="text-sm mt-2 text-gray-400 opacity-75">or press any key to start</p>
