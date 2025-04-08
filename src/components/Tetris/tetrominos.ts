@@ -87,3 +87,24 @@ export const rotateTetromino = (matrix: number[][]): number[][] => {
   
   return rotated;
 };
+
+// Get a tetromino shape with random rotation
+export const getRandomlyRotatedShape = (type: TetrominoType): number[][] => {
+  // Start with the original shape
+  let shape = [...TETROMINOS[type].shape];
+  
+  // 'O' tetromino doesn't need rotation as it's a square
+  if (type === 'O') {
+    return shape;
+  }
+  
+  // Random number of rotations (0-3)
+  const rotations = Math.floor(Math.random() * 4);
+  
+  // Apply rotations
+  for (let i = 0; i < rotations; i++) {
+    shape = rotateTetromino(shape);
+  }
+  
+  return shape;
+};

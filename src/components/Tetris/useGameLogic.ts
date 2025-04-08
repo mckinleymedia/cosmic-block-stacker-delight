@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameAction, ActiveTetromino } from './gameTypes';
 import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
 import { createEmptyBoard, checkCollision, updateBoardWithTetromino } from './boardUtils';
-import { moveTetromino, rotateTetromino, getInitialPosition } from './tetrominoUtils';
+import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino } from './tetrominoUtils';
 import { randomTetromino, TETROMINOS, TetrominoType } from './tetrominos';
 
 export const useGameLogic = () => {
@@ -24,11 +24,7 @@ export const useGameLogic = () => {
     
     setGameState({
       board: initialBoard,
-      activeTetromino: {
-        type: tetrominoType,
-        position: getInitialPosition(),
-        shape: TETROMINOS[tetrominoType].shape
-      },
+      activeTetromino: createTetromino(tetrominoType),
       nextTetromino: nextType,
       score: 0,
       level: 1,
@@ -44,11 +40,7 @@ export const useGameLogic = () => {
         const tetrominoType = randomTetromino();
         setGameState(prev => ({
           ...prev,
-          activeTetromino: {
-            type: tetrominoType,
-            position: getInitialPosition(),
-            shape: TETROMINOS[tetrominoType].shape
-          },
+          activeTetromino: createTetromino(tetrominoType),
           isPaused: false
         }));
       } else {
@@ -70,7 +62,7 @@ export const useGameLogic = () => {
     
     const nextType = randomTetromino();
     const nextPosition = getInitialPosition();
-    const nextShape = TETROMINOS[gameState.nextTetromino].shape;
+    const nextShape = createTetromino(gameState.nextTetromino).shape;
     
     if (checkCollision(nextPosition, nextShape, newBoard)) {
       setGameState(prev => ({
@@ -89,11 +81,7 @@ export const useGameLogic = () => {
     setGameState(prev => ({
       ...prev,
       board: newBoard,
-      activeTetromino: {
-        type: gameState.nextTetromino,
-        position: nextPosition,
-        shape: nextShape
-      },
+      activeTetromino: createTetromino(gameState.nextTetromino),
       nextTetromino: nextType,
       score: prev.score + pointsScored,
       linesCleared: newLinesCleared,
@@ -192,11 +180,7 @@ export const useGameLogic = () => {
       
       setGameState(prev => ({
         ...prev,
-        activeTetromino: {
-          type: tetrominoType,
-          position: getInitialPosition(),
-          shape: TETROMINOS[tetrominoType].shape
-        },
+        activeTetromino: createTetromino(tetrominoType),
         nextTetromino: nextType
       }));
       return;

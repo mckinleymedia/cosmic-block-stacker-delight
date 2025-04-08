@@ -2,7 +2,7 @@
 import { ActiveTetromino, Position, GameState } from './gameTypes';
 import { BOARD_WIDTH } from './gameConstants';
 import { checkCollision } from './boardUtils';
-import { randomTetromino, TETROMINOS, rotateTetromino as rotateMatrix, TetrominoType } from './tetrominos';
+import { randomTetromino, TETROMINOS, rotateTetromino as rotateMatrix, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
 
 // Get initial position for a new tetromino
 export const getInitialPosition = (): Position => {
@@ -14,7 +14,7 @@ export const createTetromino = (type: TetrominoType): ActiveTetromino => {
   return {
     type,
     position: getInitialPosition(),
-    shape: TETROMINOS[type].shape
+    shape: getRandomlyRotatedShape(type)
   };
 };
 

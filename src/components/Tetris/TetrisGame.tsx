@@ -6,6 +6,7 @@ import NextPiece from './NextPiece';
 import GameStats from './GameStats';
 import GameControls from './GameControls';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { createTetromino } from './tetrominoUtils';
 
 const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
@@ -25,6 +26,12 @@ const TetrisGame: React.FC = () => {
   const handleQuit = useCallback(() => {
     handleGameAction('QUIT');
   }, [handleGameAction]);
+
+  // Get the next piece shape with its random orientation for preview
+  const getNextPieceShape = () => {
+    if (!gameHasBeenPlayed) return null;
+    return createTetromino(gameState.nextTetromino).shape;
+  };
   
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
@@ -41,6 +48,7 @@ const TetrisGame: React.FC = () => {
           <NextPiece 
             nextPiece={gameState.nextTetromino} 
             showPiece={gameHasBeenPlayed}
+            nextShape={getNextPieceShape()}
           />
         </div>
         

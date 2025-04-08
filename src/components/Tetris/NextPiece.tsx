@@ -4,10 +4,11 @@ import { TETROMINOS, TetrominoType } from './tetrominos';
 
 interface NextPieceProps {
   nextPiece: TetrominoType;
-  showPiece: boolean; // Added prop to control visibility of the piece
+  showPiece: boolean;
+  nextShape?: number[][] | null;
 }
 
-const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece }) => {
+const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece, nextShape }) => {
   const tetromino = TETROMINOS[nextPiece];
   
   // Create a 4x4 display grid for all tetrominos
@@ -15,8 +16,11 @@ const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece }) => {
   
   // If showing the piece, center it in the 4x4 grid
   if (showPiece) {
+    // Use the provided shape with random rotation if available, otherwise use the default shape
+    const shape = nextShape || tetromino.shape;
+    
     // Find the actual dimensions of the tetromino (trim empty columns)
-    const rows = tetromino.shape;
+    const rows = shape;
     
     // Find the width of each row (excluding trailing zeros)
     const effectiveWidths = rows.map(row => {
@@ -40,8 +44,8 @@ const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece }) => {
     
     // Place the tetromino in the center of the display grid
     for (let row = 0; row < shapeHeight; row++) {
-      for (let col = 0; col < (tetromino.shape[row]?.length || 0); col++) {
-        if (tetromino.shape[row][col] !== 0) {
+      for (let col = 0; col < (shape[row]?.length || 0); col++) {
+        if (shape[row][col] !== 0) {
           const displayRow = row + rowOffset;
           const displayCol = col + colOffset;
           
