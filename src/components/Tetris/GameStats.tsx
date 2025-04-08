@@ -9,7 +9,7 @@ interface GameStatsProps {
 
 const GameStats: React.FC<GameStatsProps> = ({ score, level, linesCleared }) => {
   return (
-    <div className="bg-tetris-bg border-2 border-tetris-border rounded p-4 text-white">
+    <div className="bg-tetris-bg border-2 border-tetris-border rounded p-4 text-white w-full">
       <div className="mb-3">
         <h3 className="font-bold text-lg">Score</h3>
         <p className="text-2xl font-mono">{score.toLocaleString()}</p>

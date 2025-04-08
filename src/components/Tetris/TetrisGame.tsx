@@ -1,3 +1,4 @@
+
 import React, { useCallback } from 'react';
 import { useGameLogic } from './useGameLogic';
 import GameBoard from './GameBoard';
@@ -23,27 +24,22 @@ const TetrisGame: React.FC = () => {
         gameOver={gameState.gameOver} 
       />
       
-      <div className="flex flex-col gap-4 w-full md:w-auto">
-        {gameHasStarted && (
-          <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
+      <div className="flex flex-col gap-4 w-full md:w-64">
+        {gameHasStarted ? (
+          <>
             <NextPiece nextPiece={gameState.nextTetromino} />
             <GameStats 
               score={gameState.score} 
               level={gameState.level} 
               linesCleared={gameState.linesCleared} 
             />
-          </div>
-        )}
-        
-        {isMobile && gameHasStarted && (
-          <GameControls 
-            onAction={handleGameAction} 
-            isPaused={gameState.isPaused}
-            gameOver={gameState.gameOver}
-          />
-        )}
-        
-        {!gameHasStarted && !gameState.gameOver && (
+            <GameControls 
+              onAction={handleGameAction} 
+              isPaused={gameState.isPaused}
+              gameOver={gameState.gameOver}
+            />
+          </>
+        ) : (
           <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
             <Button 
               onClick={() => handleGameAction('START')} 
@@ -62,16 +58,6 @@ const TetrisGame: React.FC = () => {
           </div>
         )}
       </div>
-
-      {!isMobile && gameHasStarted && (
-        <div className="fixed bottom-4 left-4 md:static md:mt-4">
-          <GameControls 
-            onAction={handleGameAction} 
-            isPaused={gameState.isPaused}
-            gameOver={gameState.gameOver}
-          />
-        </div>
-      )}
     </div>
   );
 };
