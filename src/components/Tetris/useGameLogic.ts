@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { TETROMINOS, TetrominoType, randomTetromino, rotateTetromino } from './tetrominos';
 
@@ -260,10 +259,14 @@ export const useGameLogic = () => {
           position: newPosition
         }
       }));
+      return true; // Move was successful
     } else if (direction === 'DOWN') {
       // If can't move down, lock the tetromino
       updateBoard();
+      return false; // Move was unsuccessful (collision)
     }
+    
+    return false; // Move was unsuccessful (collision)
   }, [gameState, checkCollision, updateBoard]);
 
   // Rotate tetromino
@@ -354,18 +357,46 @@ export const useGameLogic = () => {
     }
   }, [moveTetromino, rotatePiece, hardDrop, togglePause, restartGame, startGame]);
 
-  // Game loop - THIS IS THE CRITICAL PART THAT NEEDS FIXING
+  // Game loop - CRITICAL FIX
   useEffect(() => {
-    if (gameState.isPaused || gameState.gameOver || !gameState.activeTetromino) return;
-
+    if (gameState.isPaused || gameState.gameOver) return;
+    
+    // If no active tetromino and game is not paused or over, create one
+    if (!gameState.activeTetromino && !gameState.isPaused && !gameState.gameOver) {
+      const tetrominoType = gameState.nextTetromino;
+      const nextType = randomTetromino();
+      
+      setGameState(prev => ({
+        ...prev,
+        activeTetromino: {
+          type: tetrominoType,
+          position: { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 },
+          shape: TETROMINOS[tetrominoType].shape
+        },
+        nextTetromino: nextType
+      }));
+      return;
+    }
+    
+    // Create a drop interval that moves the active tetromino down
     const interval = setInterval(() => {
-      moveTetromino('DOWN');
+      console.log("Drop interval executed", gameState.activeTetromino?.position);
+      if (gameState.activeTetromino) {
+        moveTetromino('DOWN');
+      }
     }, dropInterval());
 
     return () => {
       clearInterval(interval);
     };
-  }, [gameState.isPaused, gameState.gameOver, gameState.activeTetromino, moveTetromino, dropInterval]);
+  }, [
+    gameState.isPaused,
+    gameState.gameOver,
+    gameState.activeTetromino,
+    moveTetromino,
+    dropInterval,
+    gameState.nextTetromino
+  ]);
 
   // Keyboard controls
   useEffect(() => {
