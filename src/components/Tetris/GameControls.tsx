@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
@@ -35,7 +36,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         </div>
         
         {/* Game control button - either Pause/Resume or New Game */}
-        <Button variant="outline" onClick={() => onAction(gameOver ? 'RESTART' : 'PAUSE')} className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white">
+        <Button variant="outline" onClick={() => onAction(gameOver ? 'RESTART' : 'PAUSE')} className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
           <span className="text-sm">
             {gameOver ? 'New Game' : isPaused ? 'Resume' : 'Pause'}
           </span>
