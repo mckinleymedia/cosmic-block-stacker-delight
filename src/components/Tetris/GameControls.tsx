@@ -51,7 +51,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             <span className="text-sm">New Game</span>
           </Button>
         ) : isPaused ? (
-          // Check if a game is actually active or it's the initial state
+          // If the game is paused, we need to determine if it's a real pause or the initial state
           isGameActive ? (
             // Resume button (when game is paused)
             <Button 
