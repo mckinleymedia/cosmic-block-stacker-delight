@@ -39,12 +39,6 @@ const GameControls: React.FC<GameControlsProps> = ({
           </Button>
         </div>
         
-        {gameOver && (
-          <div className="mt-4 mb-2 text-center">
-            <p className="text-xl font-bold text-red-500">GAME OVER</p>
-          </div>
-        )}
-        
         {gameOver ?
           <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
             <span className="text-sm">New Game</span>

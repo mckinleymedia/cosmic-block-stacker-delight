@@ -69,13 +69,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
         )}
       </div>
       
-      {(gameOver || isPaused) && (
+      {gameOver && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
-          <p className="text-xl font-bold text-white mb-2">
-            {gameOver ? "GAME OVER" : "GAME PAUSED"}
-          </p>
+          <p className="text-3xl font-bold text-red-500 mb-2">GAME OVER</p>
+        </div>
+      )}
+      
+      {isPaused && !gameOver && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
+          <p className="text-xl font-bold text-white mb-2">GAME PAUSED</p>
           
-          {isPaused && !gameOver && onQuit && (
+          {onQuit && (
             <Button 
               variant="outline" 
               onClick={onQuit}
