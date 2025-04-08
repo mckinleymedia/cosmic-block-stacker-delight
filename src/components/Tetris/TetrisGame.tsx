@@ -7,19 +7,19 @@ import NextPiece from './NextPiece';
 import GameStats from './GameStats';
 import GameControls from './GameControls';
 import ScoreSubmissionDialog from './ScoreSubmissionDialog';
+import LeaderboardModal from './LeaderboardModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Trophy } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
   const { qualifiesForLeaderboard, addScore } = useLeaderboard();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
   
   const [showScoreDialog, setShowScoreDialog] = useState(false);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   
   // Game has started when there's an active tetromino (not null)
   const gameHasStarted = gameState.activeTetromino !== null;
@@ -94,8 +94,8 @@ const TetrisGame: React.FC = () => {
         
         <Button 
           variant="outline" 
-          className="border-tetris-border text-white hover:bg-tetris-border/20 mt-2"
-          onClick={() => navigate('/leaderboard')}
+          className="border-tetris-border text-white hover:bg-tetris-border/20 mt-2 bg-[#333333]"
+          onClick={() => setShowLeaderboard(true)}
         >
           <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
           Leaderboard
@@ -107,6 +107,11 @@ const TetrisGame: React.FC = () => {
         onClose={() => setShowScoreDialog(false)}
         onSubmit={handleSubmitScore}
         score={gameState.score}
+      />
+      
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onOpenChange={setShowLeaderboard}
       />
     </div>
   );
