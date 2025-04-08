@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { TETROMINOS, TetrominoType, randomTetromino, rotateTetromino } from './tetrominos';
 
@@ -237,7 +238,7 @@ export const useGameLogic = () => {
 
   // Move tetromino
   const moveTetromino = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN') => {
-    if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return;
+    if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return false;
 
     const { position, shape } = gameState.activeTetromino;
     let newPosition = { ...position };
@@ -381,8 +382,15 @@ export const useGameLogic = () => {
     // Create a drop interval that moves the active tetromino down
     const interval = setInterval(() => {
       console.log("Drop interval executed", gameState.activeTetromino?.position);
+      
+      // This is the key fix: Move the piece down repeatedly until it collides
       if (gameState.activeTetromino) {
-        moveTetromino('DOWN');
+        const moveResult = moveTetromino('DOWN');
+        if (!moveResult) {
+          // When the piece can't move down anymore (collision), updateBoard is called
+          // and a new piece is created in the next effect cycle
+          console.log("Piece locked, generating new piece");
+        }
       }
     }, dropInterval());
 
