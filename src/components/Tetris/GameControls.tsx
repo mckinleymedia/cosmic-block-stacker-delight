@@ -7,20 +7,22 @@ interface GameControlsProps {
   onAction: (action: string) => void;
   isPaused: boolean;
   gameOver: boolean;
+  hasActiveTetromino?: boolean;
 }
 
 const GameControls: React.FC<GameControlsProps> = ({
   onAction,
   isPaused,
-  gameOver
+  gameOver,
+  hasActiveTetromino = false
 }) => {
   // Game has started if isPaused is defined and there's an active tetromino
-  const isGameActive = isPaused !== null;
+  const isGameActive = isPaused !== null && hasActiveTetromino;
   
   // Show New Game button when:
   // 1. Game is over OR
-  // 2. Game hasn't started (isPaused is true and no game is active)
-  const showNewGameButton = gameOver || (isPaused === true && !isGameActive);
+  // 2. Game hasn't started yet
+  const showNewGameButton = gameOver || !isGameActive;
   
   return <div className="w-full">
       <div className="flex flex-col items-center gap-1">
@@ -44,7 +46,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         </div>
         
         {/* Display New Game button at beginning or after game over */}
-        {(gameOver || !isGameActive || (isPaused && !gameState?.activeTetromino)) ? (
+        {showNewGameButton ? (
           <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
             <span className="text-sm">New Game</span>
           </Button>

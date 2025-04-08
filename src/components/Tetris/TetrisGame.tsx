@@ -52,6 +52,7 @@ const TetrisGame: React.FC = () => {
           onAction={handleGameAction} 
           isPaused={gameState.isPaused}
           gameOver={gameState.gameOver}
+          hasActiveTetromino={gameState.activeTetromino !== null}
         />
       </div>
     </div>
