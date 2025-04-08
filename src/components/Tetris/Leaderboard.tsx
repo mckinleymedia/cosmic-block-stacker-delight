@@ -10,7 +10,6 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Trophy, Award, Medal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -25,18 +24,6 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ entries, onClear }) => {
 
   return (
     <div className="w-full">
-      <div className="flex justify-end mb-4">
-        {onClear && (
-          <Button 
-            variant="outline" 
-            onClick={onClear}
-            className="border-tetris-border text-white hover:bg-tetris-border/20"
-          >
-            Clear Scores
-          </Button>
-        )}
-      </div>
-      
       {entries.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           No high scores yet. Play a game to get on the leaderboard!
