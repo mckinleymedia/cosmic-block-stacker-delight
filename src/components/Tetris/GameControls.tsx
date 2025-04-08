@@ -2,11 +2,13 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
+
 interface GameControlsProps {
   onAction: (action: string) => void;
   isPaused: boolean;
   gameOver: boolean;
 }
+
 const GameControls: React.FC<GameControlsProps> = ({
   onAction,
   isPaused,
@@ -35,13 +37,37 @@ const GameControls: React.FC<GameControlsProps> = ({
           </Button>
         </div>
         
-        {/* Game control button - either Pause/Resume or New Game */}
-        <Button variant="outline" onClick={() => onAction(gameOver ? 'RESTART' : 'PAUSE')} className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
-          <span className="text-sm">
-            {gameOver ? 'New Game' : isPaused ? 'Resume' : 'Pause'}
-          </span>
-        </Button>
+        {/* Game control buttons */}
+        {gameOver ? (
+          // New Game button (when game is over)
+          <Button 
+            variant="outline" 
+            onClick={() => onAction('RESTART')} 
+            className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0"
+          >
+            <span className="text-sm">New Game</span>
+          </Button>
+        ) : isPaused ? (
+          // Resume button (when game is paused)
+          <Button 
+            variant="outline" 
+            onClick={() => onAction('PAUSE')} 
+            className="p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0"
+          >
+            <span className="text-sm">Resume</span>
+          </Button>
+        ) : (
+          // Pause button (when game is active)
+          <Button 
+            variant="outline" 
+            onClick={() => onAction('PAUSE')} 
+            className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0"
+          >
+            <span className="text-sm">Pause</span>
+          </Button>
+        )}
       </div>
     </div>;
 };
+
 export default GameControls;
