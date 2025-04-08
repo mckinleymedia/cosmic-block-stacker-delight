@@ -18,7 +18,7 @@ const GameControls: React.FC<GameControlsProps> = ({
       <div className="flex flex-col items-center gap-1">
         {/* Up/Rotate button */}
         <div className="flex justify-center mb-1">
-          <Button variant="outline" className="p-1 h-14 w-14 aspect-square flex flex-col items-center" onClick={() => onAction('ROTATE')} disabled={gameOver || isPaused}>
+          <Button variant="outline" className="p-1 h-16 w-16 aspect-square flex flex-col items-center" onClick={() => onAction('ROTATE')} disabled={gameOver || isPaused}>
             <ArrowUp className="h-6 w-6" />
             <span className="text-xs mt-0.25">Rotate</span>
           </Button>
@@ -26,13 +26,13 @@ const GameControls: React.FC<GameControlsProps> = ({
         
         {/* Left, Down, Right buttons */}
         <div className="flex justify-center gap-1 mb-4">
-          <Button variant="outline" className="p-1 h-14 w-14 aspect-square" onClick={() => onAction('LEFT')} disabled={gameOver || isPaused}>
+          <Button variant="outline" className="p-1 h-16 w-16 aspect-square" onClick={() => onAction('LEFT')} disabled={gameOver || isPaused}>
             <ArrowLeft className="h-7 w-7" />
           </Button>
-          <Button variant="outline" className="p-1 h-14 w-14 aspect-square" onClick={() => onAction('DOWN')} disabled={gameOver || isPaused}>
+          <Button variant="outline" className="p-1 h-16 w-16 aspect-square" onClick={() => onAction('DOWN')} disabled={gameOver || isPaused}>
             <ArrowDown className="h-7 w-7" />
           </Button>
-          <Button variant="outline" className="p-1 h-14 w-14 aspect-square" onClick={() => onAction('RIGHT')} disabled={gameOver || isPaused}>
+          <Button variant="outline" className="p-1 h-16 w-16 aspect-square" onClick={() => onAction('RIGHT')} disabled={gameOver || isPaused}>
             <ArrowRight className="h-7 w-7" />
           </Button>
         </div>
