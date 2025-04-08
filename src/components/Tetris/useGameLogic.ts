@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameAction, ActiveTetromino } from './gameTypes';
 import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
@@ -160,18 +159,14 @@ export const useGameLogic = () => {
     initializeGame();
   }, [initializeGame]);
 
-  // Quit game - reset to initial state with isPaused = true
+  // Quit game - now sets gameOver to true without resetting score
   const quitGame = useCallback(() => {
-    setGameState({
-      board: createEmptyBoard(),
+    setGameState(prev => ({
+      ...prev,
       activeTetromino: null,
-      nextTetromino: randomTetromino(),
-      score: 0,
-      level: 1,
-      linesCleared: 0,
-      gameOver: false,
+      gameOver: true,
       isPaused: true
-    });
+    }));
   }, []);
 
   // Handle game actions

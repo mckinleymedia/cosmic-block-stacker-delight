@@ -14,8 +14,8 @@ const TetrisGame: React.FC = () => {
   // Game has started when there's an active tetromino (not null)
   const gameHasStarted = gameState.activeTetromino !== null;
   
-  // Only show game over text if a game has been played (score > 0 or lines cleared > 0)
-  const showGameOver = gameState.gameOver && (gameState.score > 0 || gameState.linesCleared > 0);
+  // Show game over text if game is over (including quit state)
+  const showGameOver = gameState.gameOver;
   
   // Check if a game has been played (score > 0 or lines > 0 or active tetromino exists)
   const gameHasBeenPlayed = gameState.score > 0 || gameState.linesCleared > 0 || gameState.activeTetromino !== null;
