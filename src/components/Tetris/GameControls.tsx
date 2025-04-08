@@ -16,7 +16,8 @@ const GameControls: React.FC<GameControlsProps> = ({
 }) => {
   const isGameActive = !gameOver && isPaused !== null;
 
-  const showNewGameButton = isPaused && !isGameActive;
+  const showNewGameButton = gameOver || (isPaused && !isGameActive);
+  
   return <div className="w-full">
       <div className="flex flex-col items-center gap-1">
         <div className="flex justify-center">
@@ -38,19 +39,26 @@ const GameControls: React.FC<GameControlsProps> = ({
           </Button>
         </div>
         
+        {gameOver && (
+          <div className="mt-4 mb-2 text-center">
+            <p className="text-xl font-bold text-red-500">GAME OVER</p>
+          </div>
+        )}
+        
         {gameOver ?
-      <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
+          <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
             <span className="text-sm">New Game</span>
           </Button> : isPaused ? showNewGameButton ?
-      <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
+            <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
               <span className="text-sm">New Game</span>
             </Button> :
-      <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0">
+            <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0">
               <span className="text-sm">Resume</span>
             </Button> :
-      <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-gray-700 hover:bg-gray-100 text-white border-0">
-            <span className="text-sm">Pause</span>
-          </Button>}
+            <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-gray-700 hover:bg-gray-100 text-white border-0">
+              <span className="text-sm">Pause</span>
+            </Button>
+        }
       </div>
     </div>;
 };
