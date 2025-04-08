@@ -4,10 +4,10 @@ import { useLeaderboard } from '@/hooks/use-leaderboard';
 import Leaderboard from '@/components/Tetris/Leaderboard';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RefreshCw } from 'lucide-react';
 
 const LeaderboardPage: React.FC = () => {
-  const { leaderboard, clearLeaderboard } = useLeaderboard();
+  const { leaderboard, isLoading, clearLeaderboard, refreshLeaderboard } = useLeaderboard();
   const navigate = useNavigate();
 
   return (
@@ -22,17 +22,36 @@ const LeaderboardPage: React.FC = () => {
       </h1>
       
       <div className="w-full max-w-3xl mb-8">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate('/')}
-          className="border-tetris-border text-white hover:bg-tetris-border/20 mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Game
-        </Button>
+        <div className="flex justify-between items-center">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="border-tetris-border text-white hover:bg-tetris-border/20"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Game
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => refreshLeaderboard()}
+            className="border-tetris-border text-white hover:bg-tetris-border/20"
+            disabled={isLoading}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
       
-      <Leaderboard entries={leaderboard} onClear={clearLeaderboard} />
+      <div className="w-full max-w-3xl bg-black/40 rounded-lg p-6 shadow-lg">
+        <h2 className="text-2xl font-bold text-white mb-4">Global Leaderboard</h2>
+        <Leaderboard 
+          entries={leaderboard} 
+          onClear={clearLeaderboard} 
+          isLoading={isLoading}
+        />
+      </div>
     </div>
   );
 };

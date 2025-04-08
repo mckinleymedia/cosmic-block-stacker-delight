@@ -9,7 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { useLeaderboard } from '@/hooks/use-leaderboard';
 import Leaderboard from './Leaderboard';
-import { X } from 'lucide-react';
+import { X, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface LeaderboardModalProps {
   isOpen: boolean;
@@ -20,19 +21,35 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   isOpen, 
   onOpenChange 
 }) => {
-  const { leaderboard, clearLeaderboard } = useLeaderboard();
+  const { leaderboard, clearLeaderboard, isLoading, refreshLeaderboard } = useLeaderboard();
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="bg-tetris-bg border-tetris-border text-white sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Leaderboard
-          </DialogTitle>
+          <div className="flex justify-between items-center">
+            <DialogTitle className="text-2xl font-bold">
+              Leaderboard
+            </DialogTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refreshLeaderboard()}
+              className="border-tetris-border text-white hover:bg-tetris-border/20"
+              disabled={isLoading}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="mt-4">
-          <Leaderboard entries={leaderboard} onClear={clearLeaderboard} />
+          <Leaderboard 
+            entries={leaderboard} 
+            onClear={clearLeaderboard}
+            isLoading={isLoading} 
+          />
         </div>
         
         <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">

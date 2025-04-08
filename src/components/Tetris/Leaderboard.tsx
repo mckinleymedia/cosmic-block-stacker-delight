@@ -10,17 +10,43 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Trophy, Award, Medal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
   onClear?: () => void;
+  isLoading?: boolean;
 }
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ entries, onClear }) => {
+const Leaderboard: React.FC<LeaderboardProps> = ({ 
+  entries, 
+  onClear,
+  isLoading = false
+}) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full text-center py-8 text-muted-foreground">
+        Loading leaderboard...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -29,37 +55,75 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ entries, onClear }) => {
           No high scores yet. Play a game to get on the leaderboard!
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow className="border-tetris-border">
-              <TableHead className="text-white">Rank</TableHead>
-              <TableHead className="text-white">Player</TableHead>
-              <TableHead className="text-white text-right">Score</TableHead>
-              <TableHead className="text-white text-right">Level</TableHead>
-              <TableHead className="text-white text-right">Lines</TableHead>
-              <TableHead className="text-white text-right">Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {entries.map((entry, index) => (
-              <TableRow key={entry.id} className="border-tetris-border">
-                <TableCell>
-                  <div className="flex items-center justify-center">
-                    {index === 0 && <Trophy className="h-5 w-5 text-yellow-500" />}
-                    {index === 1 && <Medal className="h-5 w-5 text-gray-300" />}
-                    {index === 2 && <Award className="h-5 w-5 text-amber-700" />}
-                    {index > 2 && index + 1}
-                  </div>
-                </TableCell>
-                <TableCell>{entry.playerName}</TableCell>
-                <TableCell className="text-right font-mono">{entry.score.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{entry.level}</TableCell>
-                <TableCell className="text-right">{entry.linesCleared}</TableCell>
-                <TableCell className="text-right">{formatDate(entry.date)}</TableCell>
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-tetris-border">
+                <TableHead className="text-white">Rank</TableHead>
+                <TableHead className="text-white">Player</TableHead>
+                <TableHead className="text-white text-right">Score</TableHead>
+                <TableHead className="text-white text-right">Level</TableHead>
+                <TableHead className="text-white text-right">Lines</TableHead>
+                <TableHead className="text-white text-right">Date</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {entries.map((entry, index) => (
+                <TableRow key={entry.id} className="border-tetris-border">
+                  <TableCell>
+                    <div className="flex items-center justify-center">
+                      {index === 0 && <Trophy className="h-5 w-5 text-yellow-500" />}
+                      {index === 1 && <Medal className="h-5 w-5 text-gray-300" />}
+                      {index === 2 && <Award className="h-5 w-5 text-amber-700" />}
+                      {index > 2 && index + 1}
+                    </div>
+                  </TableCell>
+                  <TableCell>{entry.playerName}</TableCell>
+                  <TableCell className="text-right font-mono">{entry.score.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{entry.level}</TableCell>
+                  <TableCell className="text-right">{entry.linesCleared}</TableCell>
+                  <TableCell className="text-right">{formatDate(entry.date)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {onClear && (
+            <div className="mt-4 flex justify-end">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    className="mt-2"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Clear Leaderboard
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-tetris-bg border-tetris-border text-white">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Clear Leaderboard</AlertDialogTitle>
+                    <AlertDialogDescription className="text-white/70">
+                      Are you sure you want to clear all leaderboard entries? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="border-tetris-border text-white hover:bg-tetris-border/20 bg-transparent">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={onClear}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Clear
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
