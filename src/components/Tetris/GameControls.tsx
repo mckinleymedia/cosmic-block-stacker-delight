@@ -22,7 +22,7 @@ const GameControls: React.FC<GameControlsProps> = ({
   // This happens when the game is paused but hasn't been actively played yet (initial state or after quitting)
   const showNewGameButton = isPaused && !isGameActive;
 
-  return <div className="w-full mt-2">
+  return <div className="w-full">
       <div className="flex flex-col items-center gap-1">
         {/* Up/Rotate button */}
         <div className="flex justify-center mb-1">
