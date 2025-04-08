@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, RotateCw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, RotateCw, Play } from 'lucide-react';
 
 interface GameControlsProps {
   onAction: (action: string) => void;
@@ -17,7 +17,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           variant="outline" 
           className="p-2 md:p-4 h-auto aspect-square" 
           onClick={() => onAction('LEFT')}
-          disabled={gameOver}
+          disabled={gameOver || isPaused}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -25,7 +25,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           variant="outline" 
           className="p-2 md:p-4 h-auto aspect-square" 
           onClick={() => onAction('DOWN')}
-          disabled={gameOver}
+          disabled={gameOver || isPaused}
         >
           <ArrowDown className="h-5 w-5" />
         </Button>
@@ -33,7 +33,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           variant="outline" 
           className="p-2 md:p-4 h-auto aspect-square" 
           onClick={() => onAction('RIGHT')}
-          disabled={gameOver}
+          disabled={gameOver || isPaused}
         >
           <ArrowRight className="h-5 w-5" />
         </Button>
@@ -44,7 +44,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           variant="outline" 
           className="p-2 md:p-4 h-auto" 
           onClick={() => onAction('ROTATE')}
-          disabled={gameOver}
+          disabled={gameOver || isPaused}
         >
           <RotateCw className="h-5 w-5 mr-1" />
           <span>Rotate</span>
@@ -53,7 +53,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           variant="outline" 
           className="p-2 md:p-4 h-auto" 
           onClick={() => onAction('DROP')}
-          disabled={gameOver}
+          disabled={gameOver || isPaused}
         >
           <ArrowDown className="h-5 w-5 mr-1" />
           <span>Drop</span>
@@ -61,14 +61,25 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
       </div>
       
       <div className="grid grid-cols-2 gap-2 mt-2">
-        <Button 
-          variant={isPaused ? "default" : "outline"} 
-          className="p-2 md:p-4 h-auto" 
-          onClick={() => onAction('PAUSE')}
-          disabled={gameOver}
-        >
-          {isPaused ? 'Resume' : 'Pause'}
-        </Button>
+        {isPaused && !gameOver ? (
+          <Button 
+            variant="default" 
+            className="p-2 md:p-4 h-auto bg-green-600 hover:bg-green-700" 
+            onClick={() => onAction('START')}
+          >
+            <Play className="h-5 w-5 mr-1" />
+            Start
+          </Button>
+        ) : (
+          <Button 
+            variant={isPaused ? "default" : "outline"} 
+            className="p-2 md:p-4 h-auto" 
+            onClick={() => onAction('PAUSE')}
+            disabled={gameOver}
+          >
+            {isPaused ? 'Resume' : 'Pause'}
+          </Button>
+        )}
         <Button 
           variant="outline" 
           className="p-2 md:p-4 h-auto" 

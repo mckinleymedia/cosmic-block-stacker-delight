@@ -9,18 +9,18 @@ interface GameStatsProps {
 
 const GameStats: React.FC<GameStatsProps> = ({ score, level, linesCleared }) => {
   return (
-    <div className="bg-tetris-bg border-2 border-tetris-border rounded p-2 text-white">
-      <div className="mb-2">
-        <h3 className="font-bold">Score</h3>
-        <p className="text-xl">{score}</p>
+    <div className="bg-tetris-bg border-2 border-tetris-border rounded p-4 text-white">
+      <div className="mb-3">
+        <h3 className="font-bold text-lg">Score</h3>
+        <p className="text-2xl font-mono">{score}</p>
       </div>
-      <div className="mb-2">
-        <h3 className="font-bold">Level</h3>
-        <p className="text-xl">{level}</p>
+      <div className="mb-3">
+        <h3 className="font-bold text-lg">Level</h3>
+        <p className="text-2xl font-mono">{level}</p>
       </div>
       <div>
-        <h3 className="font-bold">Lines</h3>
-        <p className="text-xl">{linesCleared}</p>
+        <h3 className="font-bold text-lg">Lines</h3>
+        <p className="text-2xl font-mono">{linesCleared}</p>
       </div>
     </div>
   );

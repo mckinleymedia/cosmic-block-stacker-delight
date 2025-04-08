@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { TETROMINOS, TetrominoType, randomTetromino, rotateTetromino } from './tetrominos';
 
@@ -48,7 +47,8 @@ type GameAction =
   | 'ROTATE' 
   | 'DROP' 
   | 'PAUSE' 
-  | 'RESTART';
+  | 'RESTART'
+  | 'START';
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -93,6 +93,31 @@ export const useGameLogic = () => {
       isPaused: false
     });
   }, []);
+
+  // Start the game
+  const startGame = useCallback(() => {
+    if (gameState.isPaused && !gameState.gameOver) {
+      if (!gameState.activeTetromino) {
+        // First start - initialize with a tetromino
+        const tetrominoType = randomTetromino();
+        setGameState(prev => ({
+          ...prev,
+          activeTetromino: {
+            type: tetrominoType,
+            position: { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 },
+            shape: TETROMINOS[tetrominoType].shape
+          },
+          isPaused: false
+        }));
+      } else {
+        // Just unpause
+        setGameState(prev => ({
+          ...prev,
+          isPaused: false
+        }));
+      }
+    }
+  }, [gameState.isPaused, gameState.gameOver, gameState.activeTetromino]);
 
   // Check for collision
   const checkCollision = useCallback((position: Position, shape: number[][]) => {
@@ -320,10 +345,13 @@ export const useGameLogic = () => {
       case 'RESTART':
         restartGame();
         break;
+      case 'START':
+        startGame();
+        break;
       default:
         break;
     }
-  }, [moveTetromino, rotatePiece, hardDrop, togglePause, restartGame]);
+  }, [moveTetromino, rotatePiece, hardDrop, togglePause, restartGame, startGame]);
 
   // Game loop
   useEffect(() => {
@@ -345,6 +373,12 @@ export const useGameLogic = () => {
         if (event.key === 'r' || event.key === 'R') {
           restartGame();
         }
+        return;
+      }
+
+      // If game is paused and not over, any key starts it
+      if (gameState.isPaused && !gameState.gameOver) {
+        startGame();
         return;
       }
 
@@ -381,12 +415,25 @@ export const useGameLogic = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [gameState, handleGameAction, restartGame]);
+  }, [gameState, handleGameAction, restartGame, startGame]);
 
   // Initialize game on first load
   useEffect(() => {
-    initializeGame();
-  }, [initializeGame]);
+    // We no longer automatically start the game
+    // Just initialize the board, but keep the game paused
+    const initialBoard = Array(BOARD_HEIGHT).fill(null).map(() => 
+      Array(BOARD_WIDTH).fill(null).map(() => ({ filled: false, color: '' }))
+    );
+    
+    const nextType = randomTetromino();
+    
+    setGameState(prev => ({
+      ...prev,
+      board: initialBoard,
+      nextTetromino: nextType,
+      isPaused: true
+    }));
+  }, []);
 
   return {
     gameState,

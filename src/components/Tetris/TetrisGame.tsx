@@ -6,6 +6,8 @@ import NextPiece from './NextPiece';
 import GameStats from './GameStats';
 import GameControls from './GameControls';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { Play } from 'lucide-react';
 
 const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
@@ -36,13 +38,20 @@ const TetrisGame: React.FC = () => {
           />
         )}
         
-        {!gameState.activeTetromino && !gameState.gameOver && !gameState.isPaused && (
-          <div className="text-white text-center bg-tetris-bg p-2 border-2 border-tetris-border rounded">
-            Press any key to start
+        {!gameState.activeTetromino && !gameState.gameOver && gameState.isPaused && (
+          <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
+            <Button 
+              onClick={() => handleGameAction('START')} 
+              className="bg-green-600 hover:bg-green-700 mb-2 w-full"
+            >
+              <Play className="mr-2" />
+              Start Game
+            </Button>
+            <p className="text-sm mt-2">Press any key to start</p>
           </div>
         )}
         
-        {gameState.isPaused && !gameState.gameOver && (
+        {gameState.isPaused && !gameState.gameOver && gameState.activeTetromino && (
           <div className="text-white text-center bg-tetris-bg p-2 border-2 border-tetris-border rounded">
             Game Paused
           </div>
