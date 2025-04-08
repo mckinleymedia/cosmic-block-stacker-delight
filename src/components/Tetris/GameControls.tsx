@@ -21,7 +21,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           disabled={gameOver || isPaused}
         >
           <div className="flex flex-col items-center">
-            <ArrowUp className="h-3 w-3" />
+            <ArrowUp className="h-4 w-4" />
             <span className="text-xs">Rotate</span>
           </div>
         </Button>
@@ -35,7 +35,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           onClick={() => onAction('LEFT')}
           disabled={gameOver || isPaused}
         >
-          <ArrowLeft className="h-3 w-3" />
+          <ArrowLeft className="h-4 w-4" />
         </Button>
         <Button 
           variant="outline" 
@@ -43,7 +43,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           onClick={() => onAction('DOWN')}
           disabled={gameOver || isPaused}
         >
-          <ArrowDown className="h-3 w-3" />
+          <ArrowDown className="h-4 w-4" />
         </Button>
         <Button 
           variant="outline" 
@@ -51,7 +51,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           onClick={() => onAction('RIGHT')}
           disabled={gameOver || isPaused}
         >
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
       
@@ -62,7 +62,6 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           onClick={() => onAction('PAUSE')}
           disabled={gameOver}
         >
-          <span className="text-xs">Space Bar</span>
           <span className="text-xs">{isPaused ? 'Resume' : 'Pause'}</span>
         </Button>
       </div>
