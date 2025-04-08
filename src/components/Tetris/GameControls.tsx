@@ -14,6 +14,9 @@ const GameControls: React.FC<GameControlsProps> = ({
   isPaused,
   gameOver
 }) => {
+  // Determine if a game is active based on isPaused and gameOver states
+  const isGameActive = !gameOver && isPaused !== null;
+
   return <div className="w-full mt-2">
       <div className="flex flex-col items-center gap-1">
         {/* Up/Rotate button */}
@@ -48,14 +51,26 @@ const GameControls: React.FC<GameControlsProps> = ({
             <span className="text-sm">New Game</span>
           </Button>
         ) : isPaused ? (
-          // Resume button (when game is paused)
-          <Button 
-            variant="outline" 
-            onClick={() => onAction('PAUSE')} 
-            className="p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0"
-          >
-            <span className="text-sm">Resume</span>
-          </Button>
+          // Check if a game is actually active or it's the initial state
+          isGameActive ? (
+            // Resume button (when game is paused)
+            <Button 
+              variant="outline" 
+              onClick={() => onAction('PAUSE')} 
+              className="p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0"
+            >
+              <span className="text-sm">Resume</span>
+            </Button>
+          ) : (
+            // New Game button (when no game is active)
+            <Button 
+              variant="outline" 
+              onClick={() => onAction('RESTART')} 
+              className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0"
+            >
+              <span className="text-sm">New Game</span>
+            </Button>
+          )
         ) : (
           // Pause button (when game is active)
           <Button 
