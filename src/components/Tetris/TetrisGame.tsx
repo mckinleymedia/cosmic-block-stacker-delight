@@ -7,7 +7,6 @@ import GameStats from './GameStats';
 import GameControls from './GameControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
-import { Play } from 'lucide-react';
 
 const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
@@ -15,6 +14,7 @@ const TetrisGame: React.FC = () => {
   
   // Game has started when it's not paused or when there is an active tetromino
   const gameHasStarted = !gameState.isPaused || gameState.activeTetromino !== null;
+  const notInGame = !gameState.activeTetromino || gameState.gameOver;
   
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
@@ -25,44 +25,30 @@ const TetrisGame: React.FC = () => {
       />
       
       <div className="flex flex-col gap-4 w-full md:w-64">
-        {gameHasStarted ? (
-          <>
-            <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
-              <NextPiece nextPiece={gameState.nextTetromino} />
-            </div>
-            <GameStats 
-              score={gameState.score} 
-              level={gameState.level} 
-              linesCleared={gameState.linesCleared} 
-            />
-            <GameControls 
-              onAction={handleGameAction} 
-              isPaused={gameState.isPaused}
-              gameOver={gameState.gameOver}
-            />
+        <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
+          <NextPiece nextPiece={gameState.nextTetromino} />
+        </div>
+        
+        <GameStats 
+          score={gameState.score} 
+          level={gameState.level} 
+          linesCleared={gameState.linesCleared} 
+        />
+        
+        <GameControls 
+          onAction={handleGameAction} 
+          isPaused={gameState.isPaused}
+          gameOver={gameState.gameOver}
+        />
 
-            {gameState.gameOver && (
-              <div className="text-center mt-4">
-                <Button 
-                  onClick={() => handleGameAction('RESTART')} 
-                  className="bg-green-600 hover:bg-green-700 w-full p-3"
-                >
-                  New Game
-                </Button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
+        {notInGame && (
+          <div className="text-center mt-2">
             <Button 
-              onClick={() => handleGameAction('START')} 
-              className="bg-green-600 hover:bg-green-700 mb-2 w-full p-6 flex flex-col items-center justify-center min-h-48"
-              style={{ padding: '20px' }}
+              onClick={() => handleGameAction('RESTART')} 
+              className="bg-green-600 hover:bg-green-700 w-full p-3"
             >
-              <Play size={80} strokeWidth={1.5} className="mb-6" />
-              Start Game
+              New Game
             </Button>
-            <p className="text-sm mt-2 text-gray-400 opacity-75">or press any key</p>
           </div>
         )}
         

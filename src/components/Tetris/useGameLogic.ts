@@ -46,8 +46,7 @@ type GameAction =
   | 'DOWN' 
   | 'ROTATE' 
   | 'PAUSE' 
-  | 'RESTART'
-  | 'START';
+  | 'RESTART';
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -310,13 +309,10 @@ export const useGameLogic = () => {
       case 'RESTART':
         restartGame();
         break;
-      case 'START':
-        startGame();
-        break;
       default:
         break;
     }
-  }, [moveTetromino, rotatePiece, togglePause, restartGame, startGame]);
+  }, [moveTetromino, rotatePiece, togglePause, restartGame]);
 
   // Game loop - CRITICAL FIX
   useEffect(() => {
@@ -361,7 +357,7 @@ export const useGameLogic = () => {
     gameState.nextTetromino
   ]);
 
-  // Keyboard controls - Updated to include WASD keys and fix the spacebar to pause
+  // Keyboard controls - Updated to handle game start with any key and remove START action
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (gameState.gameOver) {
