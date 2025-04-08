@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { TETROMINOS, TetrominoType, randomTetromino, rotateTetromino } from './tetrominos';
 
@@ -96,7 +97,7 @@ export const useGameLogic = () => {
 
   // Start the game
   const startGame = useCallback(() => {
-    if (gameState.isPaused && !gameState.gameOver) {
+    if (gameState.isPaused) {
       if (!gameState.activeTetromino) {
         // First start - initialize with a tetromino
         const tetrominoType = randomTetromino();
@@ -117,7 +118,7 @@ export const useGameLogic = () => {
         }));
       }
     }
-  }, [gameState.isPaused, gameState.gameOver, gameState.activeTetromino]);
+  }, [gameState.isPaused, gameState.activeTetromino]);
 
   // Check for collision
   const checkCollision = useCallback((position: Position, shape: number[][]) => {
@@ -353,7 +354,7 @@ export const useGameLogic = () => {
     }
   }, [moveTetromino, rotatePiece, hardDrop, togglePause, restartGame, startGame]);
 
-  // Game loop
+  // Game loop - THIS IS THE CRITICAL PART THAT NEEDS FIXING
   useEffect(() => {
     if (gameState.isPaused || gameState.gameOver || !gameState.activeTetromino) return;
 
@@ -364,7 +365,7 @@ export const useGameLogic = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [gameState, moveTetromino, dropInterval]);
+  }, [gameState.isPaused, gameState.gameOver, gameState.activeTetromino, moveTetromino, dropInterval]);
 
   // Keyboard controls
   useEffect(() => {
