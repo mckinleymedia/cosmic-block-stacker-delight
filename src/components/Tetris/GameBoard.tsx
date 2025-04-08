@@ -4,7 +4,6 @@ import { Cell, ActiveTetromino } from './useGameLogic';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
 import { Button } from '@/components/ui/button';
-import { PowerOff } from 'lucide-react';
 
 interface GameBoardProps {
   board: Cell[][];
@@ -80,9 +79,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
             <Button 
               variant="outline" 
               onClick={onQuit}
-              className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0 flex items-center gap-1"
+              className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0"
             >
-              <PowerOff className="h-4 w-4" />
               <span>Quit</span>
             </Button>
           )}
