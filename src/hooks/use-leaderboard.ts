@@ -3,9 +3,13 @@ import { useState, useEffect } from 'react';
 import { LeaderboardEntry } from '@/components/Tetris/gameTypes';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from 'sonner';
+import { Database } from '@/integrations/supabase/types';
 
 // Maximum number of scores to display
 const MAX_SCORES = 10;
+
+// Define type for our database leaderboard table rows
+type LeaderboardRow = Database['public']['Tables']['leaderboard']['Row'];
 
 export function useLeaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -46,7 +50,7 @@ export function useLeaderboard() {
       }
 
       // Convert Supabase data to match our LeaderboardEntry type
-      const entries: LeaderboardEntry[] = data.map(entry => ({
+      const entries: LeaderboardEntry[] = (data as LeaderboardRow[]).map(entry => ({
         id: entry.id,
         playerName: entry.player_name,
         score: entry.score,
@@ -132,7 +136,7 @@ export function useLeaderboard() {
       }
 
       // If we have fewer than MAX_SCORES scores, or the new score is better than the lowest score
-      return leaderboard.length < MAX_SCORES || (data.length > 0 && score > data[0].score);
+      return leaderboard.length < MAX_SCORES || (data.length > 0 && score > (data[0] as LeaderboardRow).score);
     } catch (error) {
       console.error('Error checking leaderboard qualification:', error);
       // Default to true if we can't check
