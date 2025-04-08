@@ -48,7 +48,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             <span className="text-sm">New Game</span>
           </Button>
         ) : isPaused ? (
-          // Resume button (when game is paused)
+          // Resume button (when game is paused but started)
           <Button 
             variant="outline" 
             onClick={() => onAction('PAUSE')} 
@@ -57,13 +57,13 @@ const GameControls: React.FC<GameControlsProps> = ({
             <span className="text-sm">Resume</span>
           </Button>
         ) : (
-          // Pause or Start Game button
+          // Pause button (when game is active) or Start Game
           <Button 
             variant="outline" 
             onClick={() => onAction('PAUSE')} 
             className="p-1 h-10 w-full bg-gray-700 hover:bg-gray-600 text-white border-0"
           >
-            <span className="text-sm">{gameOver ? "New Game" : "Pause"}</span>
+            <span className="text-sm">Pause</span>
           </Button>
         )}
       </div>
