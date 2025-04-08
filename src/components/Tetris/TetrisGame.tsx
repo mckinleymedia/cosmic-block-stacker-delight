@@ -41,7 +41,6 @@ const TetrisGame: React.FC = () => {
 
             {gameState.gameOver && (
               <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
-                <h3 className="text-xl font-bold mb-2">Game Over</h3>
                 <Button 
                   onClick={() => handleGameAction('RESTART')} 
                   className="bg-green-600 hover:bg-green-700 w-full p-3"
