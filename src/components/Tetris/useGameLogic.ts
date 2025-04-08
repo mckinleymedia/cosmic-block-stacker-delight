@@ -17,7 +17,6 @@ export const useGameLogic = () => {
     isPaused: true
   });
 
-  // Initialize game
   const initializeGame = useCallback(() => {
     const initialBoard = createEmptyBoard();
     const tetrominoType = randomTetromino();
@@ -39,11 +38,9 @@ export const useGameLogic = () => {
     });
   }, []);
 
-  // Start the game
   const startGame = useCallback(() => {
     if (gameState.isPaused) {
       if (!gameState.activeTetromino) {
-        // First start - initialize with a tetromino
         const tetrominoType = randomTetromino();
         setGameState(prev => ({
           ...prev,
@@ -55,7 +52,6 @@ export const useGameLogic = () => {
           isPaused: false
         }));
       } else {
-        // Just unpause
         setGameState(prev => ({
           ...prev,
           isPaused: false
@@ -64,22 +60,18 @@ export const useGameLogic = () => {
     }
   }, [gameState.isPaused, gameState.activeTetromino]);
 
-  // Update board when tetromino locks
   const updateBoard = useCallback(() => {
     if (!gameState.activeTetromino) return;
 
-    // Update board and calculate score
     const { newBoard, linesCleared, pointsScored } = updateBoardWithTetromino(gameState);
     
     const newLinesCleared = gameState.linesCleared + linesCleared;
     const newLevel = Math.floor(newLinesCleared / 10) + 1;
     
-    // Create next tetromino
     const nextType = randomTetromino();
     const nextPosition = getInitialPosition();
     const nextShape = TETROMINOS[gameState.nextTetromino].shape;
     
-    // Check if new tetromino can be placed (game over check)
     if (checkCollision(nextPosition, nextShape, newBoard)) {
       setGameState(prev => ({
         ...prev,
@@ -94,7 +86,6 @@ export const useGameLogic = () => {
       return;
     }
     
-    // Continue game with next tetromino
     setGameState(prev => ({
       ...prev,
       board: newBoard,
@@ -110,7 +101,6 @@ export const useGameLogic = () => {
     }));
   }, [gameState]);
 
-  // Move active tetromino
   const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN') => {
     if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return false;
 
@@ -130,7 +120,6 @@ export const useGameLogic = () => {
     return false;
   }, [gameState, updateBoard]);
 
-  // Rotate active tetromino
   const rotatePieceAction = useCallback(() => {
     if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return;
 
@@ -144,7 +133,6 @@ export const useGameLogic = () => {
     }
   }, [gameState]);
 
-  // Toggle game pause
   const togglePause = useCallback(() => {
     if (gameState.gameOver) return;
 
@@ -154,12 +142,10 @@ export const useGameLogic = () => {
     }));
   }, [gameState.gameOver]);
 
-  // Restart game
   const restartGame = useCallback(() => {
     initializeGame();
   }, [initializeGame]);
 
-  // Quit game - now sets gameOver to true without resetting score
   const quitGame = useCallback(() => {
     setGameState(prev => ({
       ...prev,
@@ -169,7 +155,6 @@ export const useGameLogic = () => {
     }));
   }, []);
 
-  // Handle game actions
   const handleGameAction = useCallback((action: GameAction) => {
     switch (action) {
       case 'LEFT':
@@ -198,7 +183,6 @@ export const useGameLogic = () => {
     }
   }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame]);
 
-  // Game loop
   useEffect(() => {
     if (gameState.isPaused || gameState.gameOver) return;
     
@@ -241,7 +225,6 @@ export const useGameLogic = () => {
     gameState.nextTetromino
   ]);
 
-  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (gameState.gameOver) {
@@ -252,11 +235,9 @@ export const useGameLogic = () => {
       }
 
       if (gameState.isPaused && !gameState.gameOver) {
-        // Don't resume for spacebar - only for other keys
         if (event.key !== ' ') {
           startGame();
         } else {
-          // If it's spacebar and game is paused, toggle pause (to resume)
           togglePause();
         }
         return;
@@ -309,7 +290,6 @@ export const useGameLogic = () => {
     };
   }, [gameState, handleGameAction, restartGame, startGame, togglePause]);
 
-  // Initialize game on first load
   useEffect(() => {
     const initialBoard = createEmptyBoard();
     const nextType = randomTetromino();

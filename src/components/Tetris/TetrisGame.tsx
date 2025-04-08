@@ -17,8 +17,10 @@ const TetrisGame: React.FC = () => {
   // Show game over text if game is over (including quit state)
   const showGameOver = gameState.gameOver;
   
-  // Check if a game has been played (score > 0 or lines > 0 or active tetromino exists)
-  const gameHasBeenPlayed = gameState.score > 0 || gameState.linesCleared > 0 || gameState.activeTetromino !== null;
+  // Check if a game has been played (score > 0 or lines > 0 or active tetromino exists or board has filled cells)
+  const gameHasBeenPlayed = gameState.score > 0 || gameState.linesCleared > 0 || 
+                            gameState.activeTetromino !== null || 
+                            gameState.board.some(row => row.some(cell => cell.filled));
   
   const handleQuit = useCallback(() => {
     handleGameAction('QUIT');
@@ -28,7 +30,7 @@ const TetrisGame: React.FC = () => {
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
       <GameBoard 
         board={gameState.board} 
-        activeTetromino={gameHasBeenPlayed ? gameState.activeTetromino : null}
+        activeTetromino={gameHasStarted ? gameState.activeTetromino : null}
         gameOver={showGameOver} 
         isPaused={gameState.isPaused && gameHasStarted && !gameState.gameOver}
         onQuit={handleQuit}
