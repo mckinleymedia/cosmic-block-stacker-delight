@@ -14,8 +14,10 @@ const GameControls: React.FC<GameControlsProps> = ({
   isPaused,
   gameOver
 }) => {
+  // Game has started if isPaused is not null
   const isGameActive = !gameOver && isPaused !== null;
-
+  
+  // Show New Game button when game is over OR when paused but no active game
   const showNewGameButton = gameOver || (isPaused && !isGameActive);
   
   return <div className="w-full">
@@ -39,20 +41,19 @@ const GameControls: React.FC<GameControlsProps> = ({
           </Button>
         </div>
         
-        {gameOver ?
+        {gameOver || (isPaused && !isGameActive) ? (
           <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
             <span className="text-sm">New Game</span>
-          </Button> : isPaused ? showNewGameButton ?
-            <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
-              <span className="text-sm">New Game</span>
-            </Button> :
-            <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0">
-              <span className="text-sm">Resume</span>
-            </Button> :
-            <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-gray-700 hover:bg-gray-100 text-white border-0">
-              <span className="text-sm">Pause</span>
-            </Button>
-        }
+          </Button>
+        ) : isPaused ? (
+          <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0">
+            <span className="text-sm">Resume</span>
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-gray-700 hover:bg-gray-100 text-white border-0">
+            <span className="text-sm">Pause</span>
+          </Button>
+        )}
       </div>
     </div>;
 };
