@@ -17,6 +17,7 @@ const TetrisGame: React.FC = () => {
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
       <GameBoard 
         board={gameState.board} 
+        activeTetromino={gameState.activeTetromino}
         gameOver={gameState.gameOver} 
       />
       
