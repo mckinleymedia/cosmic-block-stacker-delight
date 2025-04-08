@@ -26,6 +26,7 @@ const TetrisGame: React.FC = () => {
         board={gameState.board} 
         activeTetromino={gameHasBeenPlayed ? gameState.activeTetromino : null}
         gameOver={showGameOver} 
+        isPaused={gameState.isPaused && gameHasStarted && !gameState.gameOver}
       />
       
       <div className="flex flex-col gap-4 w-full md:w-64">
@@ -47,12 +48,6 @@ const TetrisGame: React.FC = () => {
           isPaused={gameState.isPaused}
           gameOver={gameState.gameOver}
         />
-        
-        {gameState.isPaused && gameHasStarted && !gameState.gameOver && (
-          <div className="text-white text-center bg-tetris-bg p-2 border-2 border-tetris-border rounded">
-            Game Paused
-          </div>
-        )}
       </div>
     </div>
   );

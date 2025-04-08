@@ -8,9 +8,15 @@ interface GameBoardProps {
   board: Cell[][];
   activeTetromino: ActiveTetromino | null;
   gameOver: boolean;
+  isPaused: boolean;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ board, activeTetromino, gameOver }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ 
+  board, 
+  activeTetromino, 
+  gameOver,
+  isPaused
+}) => {
   // Create a copy of the board to render the active tetromino
   const renderBoard = JSON.parse(JSON.stringify(board));
   
@@ -44,7 +50,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, activeTetromino, gameOver 
   return (
     <div className={cn(
       "relative border-2 border-tetris-border rounded overflow-hidden",
-      gameOver && "opacity-60"
+      (gameOver || isPaused) && "opacity-60"
     )}>
       <div className="grid grid-cols-10">
         {renderBoard.map((row, rowIndex) =>
@@ -60,9 +66,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, activeTetromino, gameOver 
         )}
       </div>
       
-      {gameOver && (
+      {(gameOver || isPaused) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
-          <p className="text-xl font-bold text-white mb-2">GAME OVER</p>
+          <p className="text-xl font-bold text-white mb-2">
+            {gameOver ? "GAME OVER" : "GAME PAUSED"}
+          </p>
         </div>
       )}
     </div>
