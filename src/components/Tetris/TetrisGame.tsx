@@ -94,7 +94,7 @@ const TetrisGame: React.FC = () => {
         
         <Button 
           variant="outline" 
-          className="border-tetris-border text-white hover:bg-tetris-border/20 mt-2 bg-[#333333]"
+          className="border-tetris-border text-white/70 hover:text-white hover:bg-tetris-border/20 mt-2 bg-[#333333]"
           onClick={() => setShowLeaderboard(true)}
         >
           <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
