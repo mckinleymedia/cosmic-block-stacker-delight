@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameAction, ActiveTetromino } from './gameTypes';
 import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
@@ -76,9 +77,10 @@ export const useGameLogic = () => {
     const newLinesCleared = gameState.linesCleared + linesCleared;
     const newLevel = Math.floor(newLinesCleared / 10) + 1;
     
+    // Create a new active tetromino from the next tetromino
     const newActiveTetromino = createTetromino(gameState.nextTetromino);
-    // Use the preselected shape for the active tetromino
-    newActiveTetromino.shape = gameState.nextTetrominoShape;
+    // Use the preselected shape for the next tetromino
+    newActiveTetromino.shape = [...gameState.nextTetrominoShape];
     
     // Generate the next tetromino and its shape
     const nextType = randomTetromino();
@@ -198,8 +200,8 @@ export const useGameLogic = () => {
     
     if (!gameState.activeTetromino && !gameState.isPaused && !gameState.gameOver) {
       const activeTetromino = createTetromino(gameState.nextTetromino);
-      // Use the preselected shape for the active tetromino
-      activeTetromino.shape = gameState.nextTetrominoShape;
+      // Use the preselected shape for the next tetromino
+      activeTetromino.shape = [...gameState.nextTetrominoShape];
       
       const nextType = randomTetromino();
       const nextShape = getRandomlyRotatedShape(nextType);
