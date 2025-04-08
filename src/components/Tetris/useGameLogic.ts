@@ -3,13 +3,14 @@ import { GameState, GameAction, ActiveTetromino } from './gameTypes';
 import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
 import { createEmptyBoard, checkCollision, updateBoardWithTetromino } from './boardUtils';
 import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino } from './tetrominoUtils';
-import { randomTetromino, TETROMINOS, TetrominoType } from './tetrominos';
+import { randomTetromino, TETROMINOS, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>({
     board: createEmptyBoard(),
     activeTetromino: null,
     nextTetromino: randomTetromino(),
+    nextTetrominoShape: [], // Initialize empty, will be set properly
     score: 0,
     level: 1,
     linesCleared: 0,
@@ -17,15 +18,25 @@ export const useGameLogic = () => {
     isPaused: true
   });
 
+  // Initialize nextTetrominoShape on first render
+  useEffect(() => {
+    setGameState(prev => ({
+      ...prev,
+      nextTetrominoShape: getRandomlyRotatedShape(prev.nextTetromino)
+    }));
+  }, []);
+
   const initializeGame = useCallback(() => {
     const initialBoard = createEmptyBoard();
     const tetrominoType = randomTetromino();
     const nextType = randomTetromino();
+    const nextShape = getRandomlyRotatedShape(nextType);
     
     setGameState({
       board: initialBoard,
       activeTetromino: createTetromino(tetrominoType),
       nextTetromino: nextType,
+      nextTetrominoShape: nextShape,
       score: 0,
       level: 1,
       linesCleared: 0,
@@ -38,9 +49,14 @@ export const useGameLogic = () => {
     if (gameState.isPaused) {
       if (!gameState.activeTetromino) {
         const tetrominoType = randomTetromino();
+        const nextType = randomTetromino();
+        const nextShape = getRandomlyRotatedShape(nextType);
+        
         setGameState(prev => ({
           ...prev,
           activeTetromino: createTetromino(tetrominoType),
+          nextTetromino: nextType,
+          nextTetrominoShape: nextShape,
           isPaused: false
         }));
       } else {
@@ -60,11 +76,16 @@ export const useGameLogic = () => {
     const newLinesCleared = gameState.linesCleared + linesCleared;
     const newLevel = Math.floor(newLinesCleared / 10) + 1;
     
-    const nextType = randomTetromino();
-    const nextPosition = getInitialPosition();
-    const nextShape = createTetromino(gameState.nextTetromino).shape;
+    const newActiveTetromino = createTetromino(gameState.nextTetromino);
+    // Use the preselected shape for the active tetromino
+    newActiveTetromino.shape = gameState.nextTetrominoShape;
     
-    if (checkCollision(nextPosition, nextShape, newBoard)) {
+    // Generate the next tetromino and its shape
+    const nextType = randomTetromino();
+    const nextShape = getRandomlyRotatedShape(nextType);
+    
+    // Check if game over
+    if (checkCollision(newActiveTetromino.position, newActiveTetromino.shape, newBoard)) {
       setGameState(prev => ({
         ...prev,
         board: newBoard,
@@ -81,8 +102,9 @@ export const useGameLogic = () => {
     setGameState(prev => ({
       ...prev,
       board: newBoard,
-      activeTetromino: createTetromino(gameState.nextTetromino),
+      activeTetromino: newActiveTetromino,
       nextTetromino: nextType,
+      nextTetrominoShape: nextShape,
       score: prev.score + pointsScored,
       linesCleared: newLinesCleared,
       level: newLevel
@@ -175,13 +197,18 @@ export const useGameLogic = () => {
     if (gameState.isPaused || gameState.gameOver) return;
     
     if (!gameState.activeTetromino && !gameState.isPaused && !gameState.gameOver) {
-      const tetrominoType = gameState.nextTetromino;
+      const activeTetromino = createTetromino(gameState.nextTetromino);
+      // Use the preselected shape for the active tetromino
+      activeTetromino.shape = gameState.nextTetrominoShape;
+      
       const nextType = randomTetromino();
+      const nextShape = getRandomlyRotatedShape(nextType);
       
       setGameState(prev => ({
         ...prev,
-        activeTetromino: createTetromino(tetrominoType),
-        nextTetromino: nextType
+        activeTetromino,
+        nextTetromino: nextType,
+        nextTetrominoShape: nextShape
       }));
       return;
     }
@@ -206,7 +233,8 @@ export const useGameLogic = () => {
     gameState.activeTetromino,
     moveTetrominoAction,
     gameState.level,
-    gameState.nextTetromino
+    gameState.nextTetromino,
+    gameState.nextTetrominoShape
   ]);
 
   useEffect(() => {
@@ -277,11 +305,13 @@ export const useGameLogic = () => {
   useEffect(() => {
     const initialBoard = createEmptyBoard();
     const nextType = randomTetromino();
+    const nextShape = getRandomlyRotatedShape(nextType);
     
     setGameState(prev => ({
       ...prev,
       board: initialBoard,
       nextTetromino: nextType,
+      nextTetrominoShape: nextShape,
       isPaused: true
     }));
   }, []);

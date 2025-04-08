@@ -21,6 +21,7 @@ export type GameState = {
   board: Cell[][];
   activeTetromino: ActiveTetromino | null;
   nextTetromino: TetrominoType;
+  nextTetrominoShape: number[][]; // Added field to store the preselected shape
   score: number;
   level: number;
   linesCleared: number;

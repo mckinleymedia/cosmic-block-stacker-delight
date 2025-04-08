@@ -5,7 +5,7 @@ import { TETROMINOS, TetrominoType } from './tetrominos';
 interface NextPieceProps {
   nextPiece: TetrominoType;
   showPiece: boolean;
-  nextShape?: number[][] | null;
+  nextShape: number[][] | null;
 }
 
 const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece, nextShape }) => {
@@ -15,9 +15,9 @@ const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece, nextShape }
   const displayGrid = Array(4).fill(0).map(() => Array(4).fill(0));
   
   // If showing the piece, center it in the 4x4 grid
-  if (showPiece) {
-    // Use the provided shape with random rotation if available, otherwise use the default shape
-    const shape = nextShape || tetromino.shape;
+  if (showPiece && nextShape) {
+    // Use the preselected shape
+    const shape = nextShape;
     
     // Find the actual dimensions of the tetromino (trim empty columns)
     const rows = shape;
