@@ -39,10 +39,10 @@ const GameControls: React.FC<GameControlsProps> = ({
         </div>
         
         {gameOver ?
-      <Button variant="outline" onClick={() => onAction('RESTART')} className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
+      <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
             <span className="text-sm">New Game</span>
           </Button> : isPaused ? showNewGameButton ?
-      <Button variant="outline" onClick={() => onAction('RESTART')} className="p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
+      <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
               <span className="text-sm">New Game</span>
             </Button> :
       <Button variant="outline" onClick={() => onAction('PAUSE')} className="mt-4 p-1 h-10 w-full bg-blue-600 hover:bg-blue-500 text-white border-0">
