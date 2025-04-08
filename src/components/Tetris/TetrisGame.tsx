@@ -38,6 +38,13 @@ const TetrisGame: React.FC = () => {
               isPaused={gameState.isPaused}
               gameOver={gameState.gameOver}
             />
+
+            {gameState.gameOver && (
+              <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
+                <h3 className="text-xl font-bold mb-2">Game Over</h3>
+                <p className="text-lg">Final Score: {gameState.score.toLocaleString()}</p>
+              </div>
+            )}
           </>
         ) : (
           <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
@@ -49,7 +56,7 @@ const TetrisGame: React.FC = () => {
               <Play size={80} strokeWidth={1.5} className="mb-6" />
               Start Game
             </Button>
-            <p className="text-sm mt-2 text-gray-400 opacity-75">or press any key to start</p>
+            <p className="text-sm mt-2 text-gray-400 opacity-75">or press any key</p>
           </div>
         )}
         
