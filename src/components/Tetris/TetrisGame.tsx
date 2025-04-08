@@ -34,7 +34,7 @@ const TetrisGame: React.FC = () => {
         onQuit={handleQuit}
       />
       
-      <div className="flex flex-col gap-4 w-full md:w-64">
+      <div className="flex flex-col gap-4 w-full max-w-[200px] mx-auto">
         <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
           <NextPiece 
             nextPiece={gameState.nextTetromino} 
