@@ -122,12 +122,10 @@ export const useGameLogic = () => {
   const checkCollision = useCallback((position: Position, shape: number[][]) => {
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
-        // Only check filled cells
         if (shape[y][x] !== 0) {
           const boardX = position.x + x;
           const boardY = position.y + y;
 
-          // Check boundries
           if (
             boardX < 0 || 
             boardX >= BOARD_WIDTH || 
@@ -136,7 +134,6 @@ export const useGameLogic = () => {
             return true;
           }
 
-          // Check if cell is already filled on board
           if (boardY >= 0 && gameState.board[boardY][boardX].filled) {
             return true;
           }
@@ -153,7 +150,6 @@ export const useGameLogic = () => {
     const { position, shape, type } = gameState.activeTetromino;
     const newBoard = JSON.parse(JSON.stringify(gameState.board));
     
-    // Place tetromino
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x] !== 0) {
@@ -170,7 +166,6 @@ export const useGameLogic = () => {
       }
     }
 
-    // Check for completed lines
     const completedLines: number[] = [];
     
     for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
@@ -179,15 +174,13 @@ export const useGameLogic = () => {
       }
     }
 
-    // Remove completed lines and add empty rows at the top
     if (completedLines.length > 0) {
       for (const line of completedLines) {
         newBoard.splice(line, 1);
         newBoard.unshift(Array(BOARD_WIDTH).fill(null).map(() => ({ filled: false, color: '' })));
       }
       
-      // Update score and level
-      const newScore = gameState.score + POINTS[completedLines.length as keyof typeof POINTS];
+      const pointsScored = POINTS[completedLines.length as keyof typeof POINTS] * gameState.level;
       const newLinesCleared = gameState.linesCleared + completedLines.length;
       const newLevel = Math.floor(newLinesCleared / 10) + 1;
       
@@ -195,7 +188,7 @@ export const useGameLogic = () => {
         ...prev,
         board: newBoard,
         activeTetromino: null,
-        score: newScore,
+        score: prev.score + pointsScored,
         linesCleared: newLinesCleared,
         level: newLevel
       }));
@@ -207,12 +200,10 @@ export const useGameLogic = () => {
       }));
     }
     
-    // Generate next tetromino
     const nextType = randomTetromino();
     const nextPosition = { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 };
     const nextShape = TETROMINOS[gameState.nextTetromino].shape;
     
-    // Check for game over (collision at spawn)
     if (checkCollision(nextPosition, nextShape)) {
       setGameState(prev => ({
         ...prev,
@@ -249,7 +240,6 @@ export const useGameLogic = () => {
       newPosition.y += 1;
     }
 
-    // Check for collision
     if (!checkCollision(newPosition, shape)) {
       setGameState(prev => ({
         ...prev,
@@ -260,7 +250,6 @@ export const useGameLogic = () => {
       }));
       return true; // Move was successful
     } else if (direction === 'DOWN') {
-      // If can't move down, lock the tetromino
       updateBoard();
       return false; // Move was unsuccessful (collision)
     }
@@ -274,7 +263,6 @@ export const useGameLogic = () => {
 
     const rotated = rotateTetromino(gameState.activeTetromino.shape);
     
-    // Check for collision after rotation
     if (!checkCollision(gameState.activeTetromino.position, rotated)) {
       setGameState(prev => ({
         ...prev,
@@ -334,7 +322,6 @@ export const useGameLogic = () => {
   useEffect(() => {
     if (gameState.isPaused || gameState.gameOver) return;
     
-    // If no active tetromino and game is not paused or over, create one
     if (!gameState.activeTetromino && !gameState.isPaused && !gameState.gameOver) {
       const tetrominoType = gameState.nextTetromino;
       const nextType = randomTetromino();
@@ -351,16 +338,12 @@ export const useGameLogic = () => {
       return;
     }
     
-    // Create a drop interval that moves the active tetromino down
     const interval = setInterval(() => {
       console.log("Drop interval executed", gameState.activeTetromino?.position);
       
-      // This is the key fix: Move the piece down repeatedly until it collides
       if (gameState.activeTetromino) {
         const moveResult = moveTetromino('DOWN');
         if (!moveResult) {
-          // When the piece can't move down anymore (collision), updateBoard is called
-          // and a new piece is created in the next effect cycle
           console.log("Piece locked, generating new piece");
         }
       }
@@ -388,7 +371,6 @@ export const useGameLogic = () => {
         return;
       }
 
-      // If game is paused and not over, any key starts it
       if (gameState.isPaused && !gameState.gameOver) {
         startGame();
         return;
@@ -436,8 +418,6 @@ export const useGameLogic = () => {
 
   // Initialize game on first load
   useEffect(() => {
-    // We no longer automatically start the game
-    // Just initialize the board, but keep the game paused
     const initialBoard = Array(BOARD_HEIGHT).fill(null).map(() => 
       Array(BOARD_WIDTH).fill(null).map(() => ({ filled: false, color: '' }))
     );
