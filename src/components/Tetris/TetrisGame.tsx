@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useGameLogic } from './useGameLogic';
 import GameBoard from './GameBoard';
 import NextPiece from './NextPiece';
