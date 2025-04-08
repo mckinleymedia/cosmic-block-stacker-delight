@@ -7,7 +7,7 @@ import GameStats from './GameStats';
 import GameControls from './GameControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
-import { Play, RotateCcw } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
@@ -42,12 +42,10 @@ const TetrisGame: React.FC = () => {
             {gameState.gameOver && (
               <div className="text-white text-center bg-tetris-bg p-4 border-2 border-tetris-border rounded">
                 <h3 className="text-xl font-bold mb-2">Game Over</h3>
-                <p className="text-lg mb-4">Final Score: {gameState.score.toLocaleString()}</p>
                 <Button 
                   onClick={() => handleGameAction('RESTART')} 
                   className="bg-green-600 hover:bg-green-700 w-full p-3"
                 >
-                  <RotateCcw className="mr-2 h-5 w-5" />
                   New Game
                 </Button>
               </div>

@@ -17,12 +17,12 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         <div className="flex justify-center mb-1">
           <Button 
             variant="outline" 
-            className="p-1 h-12 w-12 aspect-square flex flex-col items-center" 
+            className="p-1 h-14 w-14 aspect-square flex flex-col items-center" 
             onClick={() => onAction('ROTATE')}
             disabled={gameOver || isPaused}
           >
-            <ArrowUp className="h-5 w-5" />
-            <span className="text-xs mt-0.5">Rotate</span>
+            <ArrowUp className="h-6 w-6" />
+            <span className="text-xs mt-0.25">Rotate</span>
           </Button>
         </div>
         
@@ -30,39 +30,41 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         <div className="flex justify-center gap-1 mb-4">
           <Button 
             variant="outline" 
-            className="p-1 h-12 w-12 aspect-square" 
+            className="p-1 h-14 w-14 aspect-square" 
             onClick={() => onAction('LEFT')}
             disabled={gameOver || isPaused}
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-7 w-7" />
           </Button>
           <Button 
             variant="outline" 
-            className="p-1 h-12 w-12 aspect-square" 
+            className="p-1 h-14 w-14 aspect-square" 
             onClick={() => onAction('DOWN')}
             disabled={gameOver || isPaused}
           >
-            <ArrowDown className="h-6 w-6" />
+            <ArrowDown className="h-7 w-7" />
           </Button>
           <Button 
             variant="outline" 
-            className="p-1 h-12 w-12 aspect-square" 
+            className="p-1 h-14 w-14 aspect-square" 
             onClick={() => onAction('RIGHT')}
             disabled={gameOver || isPaused}
           >
-            <ArrowRight className="h-6 w-6" />
+            <ArrowRight className="h-7 w-7" />
           </Button>
         </div>
         
         {/* Pause button */}
-        <Button 
-          variant="outline" 
-          className="p-1 h-8 w-full" 
-          onClick={() => onAction('PAUSE')}
-          disabled={gameOver}
-        >
-          <span className="text-sm">{isPaused ? 'Resume' : 'Pause'}</span>
-        </Button>
+        {!gameOver && (
+          <Button 
+            variant="outline" 
+            className="p-1 h-10 w-full" 
+            onClick={() => onAction('PAUSE')}
+            disabled={gameOver}
+          >
+            <span className="text-sm">{isPaused ? 'Resume' : 'Pause'}</span>
+          </Button>
+        )}
       </div>
     </div>
   );
