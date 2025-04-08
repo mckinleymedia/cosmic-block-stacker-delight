@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
@@ -34,6 +33,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           const boardY = position.y + y;
           const boardX = position.x + x;
           
+          // Only render cells that are within the visible board area
           if (
             boardY >= 0 && 
             boardY < renderBoard.length && 

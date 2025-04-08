@@ -9,12 +9,34 @@ export const getInitialPosition = (): Position => {
   return { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 };
 };
 
+// Find the lowest block in each column of the tetromino shape
+const findLowestBlocks = (shape: number[][]): number => {
+  const height = shape.length;
+  
+  // Start from the bottom of the shape and move up
+  for (let y = height - 1; y >= 0; y--) {
+    // Check if this row has any filled cells
+    if (shape[y].some(cell => cell !== 0)) {
+      return y;
+    }
+  }
+  
+  return 0; // Default if shape is empty (shouldn't happen with valid tetrominos)
+};
+
 // Create a new active tetromino
 export const createTetromino = (type: TetrominoType): ActiveTetromino => {
+  const shape = getRandomlyRotatedShape(type);
+  const lowestRow = findLowestBlocks(shape);
+  
+  // Position the piece so its lowest row is at y=0
+  const position = getInitialPosition();
+  position.y = -lowestRow;
+  
   return {
     type,
-    position: getInitialPosition(),
-    shape: getRandomlyRotatedShape(type)
+    position,
+    shape
   };
 };
 

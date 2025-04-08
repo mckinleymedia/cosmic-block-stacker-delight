@@ -22,6 +22,11 @@ export const checkCollision = (
         const boardX = position.x + x;
         const boardY = position.y + y;
 
+        // Skip collision detection for cells above the board
+        if (boardY < 0) {
+          continue;
+        }
+
         if (
           boardX < 0 || 
           boardX >= BOARD_WIDTH || 
