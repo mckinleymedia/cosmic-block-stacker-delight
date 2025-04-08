@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Cell, ActiveTetromino } from './useGameLogic';
+import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
 import { Button } from '@/components/ui/button';
