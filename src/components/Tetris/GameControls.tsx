@@ -54,17 +54,16 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           </Button>
         </div>
         
-        {/* Pause button */}
-        {!gameOver && (
-          <Button 
-            variant="outline" 
-            className="p-1 h-10 w-full" 
-            onClick={() => onAction('PAUSE')}
-            disabled={gameOver}
-          >
-            <span className="text-sm">{isPaused ? 'Resume' : 'Pause'}</span>
-          </Button>
-        )}
+        {/* Game control button - either Pause/Resume or New Game */}
+        <Button 
+          variant="outline" 
+          className="p-1 h-10 w-full" 
+          onClick={() => onAction(gameOver ? 'RESTART' : 'PAUSE')}
+        >
+          <span className="text-sm">
+            {gameOver ? 'New Game' : (isPaused ? 'Resume' : 'Pause')}
+          </span>
+        </Button>
       </div>
     </div>
   );

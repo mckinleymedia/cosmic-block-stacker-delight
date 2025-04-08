@@ -6,7 +6,6 @@ import NextPiece from './NextPiece';
 import GameStats from './GameStats';
 import GameControls from './GameControls';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
 
 const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
@@ -14,7 +13,6 @@ const TetrisGame: React.FC = () => {
   
   // Game has started when it's not paused or when there is an active tetromino
   const gameHasStarted = !gameState.isPaused || gameState.activeTetromino !== null;
-  const notInGame = !gameState.activeTetromino || gameState.gameOver;
   
   // Only show game over text if a game has been played (score > 0 or lines cleared > 0)
   const showGameOver = gameState.gameOver && (gameState.score > 0 || gameState.linesCleared > 0);
@@ -49,17 +47,6 @@ const TetrisGame: React.FC = () => {
           isPaused={gameState.isPaused}
           gameOver={gameState.gameOver}
         />
-
-        {notInGame && (
-          <div className="text-center mt-2">
-            <Button 
-              onClick={() => handleGameAction('RESTART')} 
-              className="bg-green-600 hover:bg-green-700 w-full p-3"
-            >
-              New Game
-            </Button>
-          </div>
-        )}
         
         {gameState.isPaused && gameHasStarted && !gameState.gameOver && (
           <div className="text-white text-center bg-tetris-bg p-2 border-2 border-tetris-border rounded">
