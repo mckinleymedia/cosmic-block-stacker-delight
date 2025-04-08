@@ -14,11 +14,13 @@ const GameControls: React.FC<GameControlsProps> = ({
   isPaused,
   gameOver
 }) => {
-  // Game has started if isPaused is not null
-  const isGameActive = !gameOver && isPaused !== null;
+  // Game has started if isPaused is defined and there's an active tetromino
+  const isGameActive = isPaused !== null;
   
-  // Show New Game button when game is over OR when paused but no active game
-  const showNewGameButton = gameOver || (isPaused && !isGameActive);
+  // Show New Game button when:
+  // 1. Game is over OR
+  // 2. Game hasn't started (isPaused is true and no game is active)
+  const showNewGameButton = gameOver || (isPaused === true && !isGameActive);
   
   return <div className="w-full">
       <div className="flex flex-col items-center gap-1">
@@ -41,7 +43,8 @@ const GameControls: React.FC<GameControlsProps> = ({
           </Button>
         </div>
         
-        {gameOver || (isPaused && !isGameActive) ? (
+        {/* Display New Game button at beginning or after game over */}
+        {(gameOver || !isGameActive || (isPaused && !gameState?.activeTetromino)) ? (
           <Button variant="outline" onClick={() => onAction('RESTART')} className="mt-4 p-1 h-10 w-full bg-green-600 hover:bg-green-500 text-white border-0">
             <span className="text-sm">New Game</span>
           </Button>
