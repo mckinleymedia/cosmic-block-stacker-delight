@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { TETROMINOS, TetrominoType, randomTetromino, rotateTetromino } from './tetrominos';
 
@@ -406,7 +405,7 @@ export const useGameLogic = () => {
     gameState.nextTetromino
   ]);
 
-  // Keyboard controls
+  // Keyboard controls - Updated to include WASD keys
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (gameState.gameOver) {
@@ -424,15 +423,23 @@ export const useGameLogic = () => {
 
       switch (event.key) {
         case 'ArrowLeft':
+        case 'a':
+        case 'A':
           handleGameAction('LEFT');
           break;
         case 'ArrowRight':
+        case 'd':
+        case 'D':
           handleGameAction('RIGHT');
           break;
         case 'ArrowDown':
+        case 's':
+        case 'S':
           handleGameAction('DOWN');
           break;
         case 'ArrowUp':
+        case 'w':
+        case 'W':
           handleGameAction('ROTATE');
           break;
         case ' ':

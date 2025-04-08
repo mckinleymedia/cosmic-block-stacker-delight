@@ -67,8 +67,9 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
       
       <div className="mt-4 text-white text-sm">
         <h4 className="font-bold mb-1">Keyboard Controls:</h4>
-        <p>← →: Move</p>
-        <p>↑: Rotate</p>
+        <p>← →: Move (or A/D)</p>
+        <p>↑: Rotate (or W)</p>
+        <p>↓: Soft Drop (or S)</p>
         <p>Space: Hard Drop</p>
         <p>P: Pause</p>
         <p>R: Restart</p>
