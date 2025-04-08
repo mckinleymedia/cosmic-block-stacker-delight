@@ -27,7 +27,9 @@ const TetrisGame: React.FC = () => {
       <div className="flex flex-col gap-4 w-full md:w-64">
         {gameHasStarted ? (
           <>
-            <NextPiece nextPiece={gameState.nextTetromino} />
+            <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
+              <NextPiece nextPiece={gameState.nextTetromino} />
+            </div>
             <GameStats 
               score={gameState.score} 
               level={gameState.level} 
