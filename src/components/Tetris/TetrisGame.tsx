@@ -11,13 +11,13 @@ const TetrisGame: React.FC = () => {
   const { gameState, handleGameAction } = useGameLogic();
   const isMobile = useIsMobile();
   
-  // Game has started when it's not paused or when there is an active tetromino
-  const gameHasStarted = !gameState.isPaused || gameState.activeTetromino !== null;
+  // Game has started when there's an active tetromino (not null)
+  const gameHasStarted = gameState.activeTetromino !== null;
   
   // Only show game over text if a game has been played (score > 0 or lines cleared > 0)
   const showGameOver = gameState.gameOver && (gameState.score > 0 || gameState.linesCleared > 0);
   
-  // Check if a game has been played (score > 0 or lines > 0)
+  // Check if a game has been played (score > 0 or lines > 0 or active tetromino exists)
   const gameHasBeenPlayed = gameState.score > 0 || gameState.linesCleared > 0 || gameState.activeTetromino !== null;
   
   const handleQuit = useCallback(() => {
