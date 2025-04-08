@@ -4,6 +4,7 @@ import { Cell, ActiveTetromino } from './useGameLogic';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
 import { Button } from '@/components/ui/button';
+import { PowerOff } from 'lucide-react';
 
 interface GameBoardProps {
   board: Cell[][];
@@ -23,52 +24,54 @@ const GameBoard: React.FC<GameBoardProps> = ({
   // Create a copy of the board to render the active tetromino
   const renderBoard = JSON.parse(JSON.stringify(board));
   
-  // Place active tetromino on the board for rendering
+  // Add the active tetromino to the board for rendering
   if (activeTetromino) {
-    const { shape, position, type } = activeTetromino;
+    const { position, shape, type } = activeTetromino;
+    const color = TETROMINOS[type].color;
     
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) {
+        if (shape[y][x] !== 0) {
           const boardY = position.y + y;
           const boardX = position.x + x;
           
-          // Make sure it's on the board
-          if (boardY >= 0 && boardY < renderBoard.length && 
-              boardX >= 0 && boardX < renderBoard[0].length) {
-            renderBoard[boardY][boardX] = { 
-              filled: true, 
-              color: TETROMINOS[type].color 
+          if (
+            boardY >= 0 && 
+            boardY < renderBoard.length && 
+            boardX >= 0 && 
+            boardX < renderBoard[0].length
+          ) {
+            renderBoard[boardY][boardX] = {
+              filled: true,
+              color: color
             };
           }
         }
       }
     }
   }
-  
+
   return (
-    <div className="relative w-full max-w-xs mx-auto bg-tetris-bg border-4 border-tetris-border rounded-md overflow-hidden">
-      <div className="grid grid-cols-10 gap-[1px] p-1">
-        {renderBoard.map((row: Cell[], rowIndex: number) => (
-          <React.Fragment key={`row-${rowIndex}`}>
-            {row.map((cell: Cell, cellIndex: number) => (
-              <div 
-                key={`cell-${rowIndex}-${cellIndex}`}
-                className={cn(
-                  "aspect-square w-full rounded-sm",
-                  cell.filled 
-                    ? `bg-tetris-${cell.color}` 
-                    : "bg-tetris-grid"
-                )}
-              />
-            ))}
-          </React.Fragment>
-        ))}
+    <div className={cn(
+      "relative border-2 border-tetris-border rounded overflow-hidden",
+      (gameOver || isPaused) && "opacity-60"
+    )}>
+      <div className="grid grid-cols-10">
+        {renderBoard.map((row, rowIndex) =>
+          row.map((cell, cellIndex) => (
+            <div 
+              key={`${rowIndex}-${cellIndex}`}
+              className={cn(
+                "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
+                cell.filled ? cell.color : "bg-tetris-bg"
+              )}
+            />
+          ))
+        )}
       </div>
       
-      {/* Game over or pause overlay */}
       {(gameOver || isPaused) && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
           <p className="text-xl font-bold text-white mb-2">
             {gameOver ? "GAME OVER" : "GAME PAUSED"}
           </p>
@@ -77,8 +80,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
             <Button 
               variant="outline" 
               onClick={onQuit}
-              className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0"
+              className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0 flex items-center gap-1"
             >
+              <PowerOff className="h-4 w-4" />
               <span>Quit</span>
             </Button>
           )}
