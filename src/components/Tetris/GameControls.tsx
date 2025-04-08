@@ -17,11 +17,12 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         <div className="flex justify-center mb-1">
           <Button 
             variant="outline" 
-            className="p-1 h-12 w-12 aspect-square" 
+            className="p-1 h-12 w-12 aspect-square flex flex-col items-center" 
             onClick={() => onAction('ROTATE')}
             disabled={gameOver || isPaused}
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp className="h-5 w-5" />
+            <span className="text-xs mt-0.5">Rotate</span>
           </Button>
         </div>
         
