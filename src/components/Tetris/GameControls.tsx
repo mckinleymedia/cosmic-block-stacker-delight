@@ -61,7 +61,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           onClick={() => onAction(gameOver ? 'RESTART' : 'PAUSE')}
         >
           <span className="text-sm">
-            {gameOver ? 'New Game' : (isPaused ? 'Resume' : 'Pause')}
+            {gameOver ? 'New Game' : (isPaused ? 'Start Game' : 'Pause')}
           </span>
         </Button>
       </div>
