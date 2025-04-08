@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { useLeaderboard } from '@/hooks/use-leaderboard';
 import Leaderboard from './Leaderboard';
-import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface LeaderboardModalProps {
@@ -28,15 +27,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       <DialogContent className="bg-tetris-bg border-tetris-border text-white sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            <span className="inline-flex items-center gap-2">
-              <span className="text-tetris-i">T</span>
-              <span className="text-tetris-j">E</span>
-              <span className="text-tetris-l">T</span>
-              <span className="text-tetris-o">R</span>
-              <span className="text-tetris-i">I</span>
-              <span className="text-tetris-s">S</span>
-              <span className="ml-2 text-white">Leaderboard</span>
-            </span>
+            Leaderboard
           </DialogTitle>
         </DialogHeader>
         

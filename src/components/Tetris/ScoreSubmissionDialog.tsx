@@ -25,11 +25,11 @@ const ScoreSubmissionDialog: React.FC<ScoreSubmissionDialogProps> = ({
   onSubmit, 
   score 
 }) => {
-  const [playerName, setPlayerName] = useState('Player');
+  const [initials, setInitials] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(playerName.trim() || 'Player');
+    onSubmit(initials.trim() || 'AAA');
   };
 
   return (
@@ -41,21 +41,22 @@ const ScoreSubmissionDialog: React.FC<ScoreSubmissionDialogProps> = ({
             New High Score: {score.toLocaleString()}
           </DialogTitle>
           <DialogDescription className="text-white/70">
-            Congratulations! Your score qualifies for the leaderboard.
+            Congratulations! Enter your initials for the leaderboard.
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-4 py-4">
-            <label htmlFor="playerName" className="text-sm font-medium">
-              Enter your name:
+            <label htmlFor="initials" className="text-sm font-medium">
+              Your initials:
             </label>
             <Input
-              id="playerName"
-              className="bg-tetris-bg border-tetris-border text-white"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              maxLength={20}
+              id="initials"
+              className="bg-tetris-bg border-tetris-border text-white text-center font-mono uppercase"
+              value={initials}
+              onChange={(e) => setInitials(e.target.value.slice(0, 3).toUpperCase())}
+              maxLength={3}
+              placeholder="AAA"
               autoFocus
             />
           </div>
