@@ -4,9 +4,10 @@ import { TETROMINOS, TetrominoType } from './tetrominos';
 
 interface NextPieceProps {
   nextPiece: TetrominoType;
+  showPiece: boolean; // Added prop to control visibility of the piece
 }
 
-const NextPiece: React.FC<NextPieceProps> = ({ nextPiece }) => {
+const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece }) => {
   const tetromino = TETROMINOS[nextPiece];
   
   return (
@@ -17,7 +18,9 @@ const NextPiece: React.FC<NextPieceProps> = ({ nextPiece }) => {
           {Array.from({ length: 4 }).map((_, rowIndex) =>
             Array.from({ length: 4 }).map((_, cellIndex) => {
               // Check if this cell should be filled based on the tetromino shape
+              // Only show filled cells if showPiece is true
               const isFilled = 
+                showPiece &&
                 rowIndex < tetromino.shape.length && 
                 cellIndex < tetromino.shape[0].length && 
                 tetromino.shape[rowIndex][cellIndex] !== 0;

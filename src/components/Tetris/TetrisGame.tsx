@@ -19,17 +19,23 @@ const TetrisGame: React.FC = () => {
   // Only show game over text if a game has been played (score > 0 or lines cleared > 0)
   const showGameOver = gameState.gameOver && (gameState.score > 0 || gameState.linesCleared > 0);
   
+  // Check if a game has been played (score > 0 or lines > 0)
+  const gameHasBeenPlayed = gameState.score > 0 || gameState.linesCleared > 0 || gameState.activeTetromino !== null;
+  
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
       <GameBoard 
         board={gameState.board} 
-        activeTetromino={gameState.activeTetromino}
+        activeTetromino={gameHasBeenPlayed ? gameState.activeTetromino : null}
         gameOver={showGameOver} 
       />
       
       <div className="flex flex-col gap-4 w-full md:w-64">
         <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
-          <NextPiece nextPiece={gameState.nextTetromino} />
+          <NextPiece 
+            nextPiece={gameState.nextTetromino} 
+            showPiece={gameHasBeenPlayed}
+          />
         </div>
         
         <GameStats 
