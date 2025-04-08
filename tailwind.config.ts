@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,18 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				tetris: {
+					'bg': '#121212',
+					'grid': '#232323',
+					'border': '#333333',
+					'i': '#00f0f0', // cyan
+					'j': '#0000f0', // blue
+					'l': '#f0a000', // orange
+					'o': '#f0f000', // yellow
+					's': '#00f000', // green
+					't': '#a000f0', // purple
+					'z': '#f00000', // red
 				}
 			},
 			borderRadius: {
@@ -84,11 +97,22 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'tetris-drop': {
+					'0%': { transform: 'translateY(-100%)' },
+					'100%': { transform: 'translateY(0)' }
+				},
+				'tetris-clear': {
+					'0%': { opacity: '1' },
+					'50%': { opacity: '0.5' },
+					'100%': { opacity: '0' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'tetris-drop': 'tetris-drop 0.5s ease-in',
+				'tetris-clear': 'tetris-clear 0.3s ease-out'
 			}
 		}
 	},
