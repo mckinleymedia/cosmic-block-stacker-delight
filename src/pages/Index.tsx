@@ -12,9 +12,6 @@ const Index = () => {
         <span className="text-tetris-s">I</span>
         <span className="text-tetris-t">S</span>
       </h1>
-      <div className="text-white text-center mb-4">
-        <p className="font-mono">Arrow keys or WASD to move • Click any key to begin</p>
-      </div>
       <TetrisGame />
     </div>
   );

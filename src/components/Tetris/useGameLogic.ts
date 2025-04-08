@@ -361,7 +361,7 @@ export const useGameLogic = () => {
     gameState.nextTetromino
   ]);
 
-  // Keyboard controls - Updated to include WASD keys and remove hard drop
+  // Keyboard controls - Updated to include WASD keys and fix the spacebar to pause
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (gameState.gameOver) {
@@ -372,7 +372,13 @@ export const useGameLogic = () => {
       }
 
       if (gameState.isPaused && !gameState.gameOver) {
-        startGame();
+        // Don't resume for spacebar - only for other keys
+        if (event.key !== ' ') {
+          startGame();
+        } else {
+          // If it's spacebar and game is paused, toggle pause (to resume)
+          togglePause();
+        }
         return;
       }
 
@@ -397,6 +403,9 @@ export const useGameLogic = () => {
         case 'W':
           handleGameAction('ROTATE');
           break;
+        case ' ':  // Spacebar for pause
+          handleGameAction('PAUSE');
+          break;
         case 'p':
         case 'P':
           handleGameAction('PAUSE');
@@ -414,7 +423,7 @@ export const useGameLogic = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [gameState, handleGameAction, restartGame, startGame]);
+  }, [gameState, handleGameAction, restartGame, startGame, togglePause]);
 
   // Initialize game on first load
   useEffect(() => {

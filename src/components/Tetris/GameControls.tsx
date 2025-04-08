@@ -57,7 +57,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
       
       <div className="grid grid-cols-1 gap-2 mt-4">
         <Button 
-          variant={isPaused ? "default" : "outline"} 
+          variant="outline" 
           className="p-2 md:p-4 h-auto flex items-center justify-center" 
           onClick={() => onAction('PAUSE')}
           disabled={gameOver}
