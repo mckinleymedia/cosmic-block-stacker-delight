@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, ArrowUp, RotateCw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCw } from 'lucide-react';
 
 interface GameControlsProps {
   onAction: (action: string) => void;
@@ -33,7 +33,7 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         </Button>
       </div>
       
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         <Button 
           variant="outline" 
           className="p-2 md:p-4 h-auto" 
@@ -42,15 +42,6 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         >
           <RotateCw className="h-5 w-5 mr-1" />
           <span>Rotate</span>
-        </Button>
-        <Button 
-          variant="outline" 
-          className="p-2 md:p-4 h-auto" 
-          onClick={() => onAction('DROP')}
-          disabled={gameOver || isPaused}
-        >
-          <ArrowUp className="h-5 w-5 mr-1" />
-          <span>Drop</span>
         </Button>
       </div>
       
@@ -70,7 +61,6 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         <p>← →: Move (or A/D)</p>
         <p>↑: Rotate (or W)</p>
         <p>↓: Soft Drop (or S)</p>
-        <p>Space: Hard Drop</p>
         <p>P: Pause</p>
         <p>R: Restart</p>
       </div>

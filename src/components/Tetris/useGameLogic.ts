@@ -45,7 +45,6 @@ type GameAction =
   | 'RIGHT' 
   | 'DOWN' 
   | 'ROTATE' 
-  | 'DROP' 
   | 'PAUSE' 
   | 'RESTART'
   | 'START';
@@ -287,29 +286,6 @@ export const useGameLogic = () => {
     }
   }, [gameState, checkCollision]);
 
-  // Hard drop
-  const hardDrop = useCallback(() => {
-    if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return;
-
-    let newPosition = { ...gameState.activeTetromino.position };
-    
-    // Move down until collision
-    while (!checkCollision({ ...newPosition, y: newPosition.y + 1 }, gameState.activeTetromino.shape)) {
-      newPosition.y += 1;
-    }
-    
-    setGameState(prev => ({
-      ...prev,
-      activeTetromino: {
-        ...prev.activeTetromino!,
-        position: newPosition
-      }
-    }));
-    
-    // Lock the tetromino
-    setTimeout(updateBoard, 10);
-  }, [gameState, checkCollision, updateBoard]);
-
   // Toggle game pause
   const togglePause = useCallback(() => {
     if (gameState.gameOver) return;
@@ -340,9 +316,6 @@ export const useGameLogic = () => {
       case 'ROTATE':
         rotatePiece();
         break;
-      case 'DROP':
-        hardDrop();
-        break;
       case 'PAUSE':
         togglePause();
         break;
@@ -355,7 +328,7 @@ export const useGameLogic = () => {
       default:
         break;
     }
-  }, [moveTetromino, rotatePiece, hardDrop, togglePause, restartGame, startGame]);
+  }, [moveTetromino, rotatePiece, togglePause, restartGame, startGame]);
 
   // Game loop - CRITICAL FIX
   useEffect(() => {
@@ -405,7 +378,7 @@ export const useGameLogic = () => {
     gameState.nextTetromino
   ]);
 
-  // Keyboard controls - Updated to include WASD keys
+  // Keyboard controls - Updated to include WASD keys and remove hard drop
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (gameState.gameOver) {
@@ -441,9 +414,6 @@ export const useGameLogic = () => {
         case 'w':
         case 'W':
           handleGameAction('ROTATE');
-          break;
-        case ' ':
-          handleGameAction('DROP');
           break;
         case 'p':
         case 'P':
