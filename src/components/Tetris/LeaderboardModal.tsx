@@ -9,8 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { useLeaderboard } from '@/hooks/use-leaderboard';
 import Leaderboard from './Leaderboard';
-import { X, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 interface LeaderboardModalProps {
   isOpen: boolean;
@@ -21,7 +20,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   isOpen, 
   onOpenChange 
 }) => {
-  const { leaderboard, clearLeaderboard, isLoading, refreshLeaderboard } = useLeaderboard();
+  const { leaderboard, clearLeaderboard, isLoading } = useLeaderboard();
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -31,16 +30,6 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             <DialogTitle className="text-2xl font-bold">
               Leaderboard
             </DialogTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refreshLeaderboard()}
-              className="border-tetris-border text-white hover:bg-tetris-border/20"
-              disabled={isLoading}
-            >
-              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
           </div>
         </DialogHeader>
         
