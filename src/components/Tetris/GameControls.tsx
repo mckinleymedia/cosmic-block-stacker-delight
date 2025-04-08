@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, RotateCw, Play } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUp, RotateCw } from 'lucide-react';
 
 interface GameControlsProps {
   onAction: (action: string) => void;
@@ -21,14 +21,8 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Button 
-          variant="outline" 
-          className="p-2 md:p-4 h-auto aspect-square" 
-          onClick={() => onAction('DOWN')}
-          disabled={gameOver || isPaused}
-        >
-          <ArrowDown className="h-5 w-5" />
-        </Button>
+        {/* Down button removed */}
+        <div></div>
         <Button 
           variant="outline" 
           className="p-2 md:p-4 h-auto aspect-square" 
@@ -55,43 +49,25 @@ const GameControls: React.FC<GameControlsProps> = ({ onAction, isPaused, gameOve
           onClick={() => onAction('DROP')}
           disabled={gameOver || isPaused}
         >
-          <ArrowDown className="h-5 w-5 mr-1" />
+          <ArrowUp className="h-5 w-5 mr-1" />
           <span>Drop</span>
         </Button>
       </div>
       
-      <div className="grid grid-cols-2 gap-2 mt-2">
-        {isPaused && !gameOver ? (
-          <Button 
-            variant="default" 
-            className="p-2 md:p-4 h-auto bg-green-600 hover:bg-green-700" 
-            onClick={() => onAction('START')}
-          >
-            <Play className="h-5 w-5 mr-1" />
-            Start
-          </Button>
-        ) : (
-          <Button 
-            variant={isPaused ? "default" : "outline"} 
-            className="p-2 md:p-4 h-auto" 
-            onClick={() => onAction('PAUSE')}
-            disabled={gameOver}
-          >
-            {isPaused ? 'Resume' : 'Pause'}
-          </Button>
-        )}
+      <div className="grid grid-cols-1 gap-2 mt-2">
         <Button 
-          variant="outline" 
+          variant={isPaused ? "default" : "outline"} 
           className="p-2 md:p-4 h-auto" 
-          onClick={() => onAction('RESTART')}
+          onClick={() => onAction('PAUSE')}
+          disabled={gameOver}
         >
-          Restart
+          {isPaused ? 'Resume' : 'Pause'}
         </Button>
       </div>
       
       <div className="mt-4 text-white text-sm">
         <h4 className="font-bold mb-1">Keyboard Controls:</h4>
-        <p>← → ↓: Move</p>
+        <p>← →: Move</p>
         <p>↑: Rotate</p>
         <p>Space: Hard Drop</p>
         <p>P: Pause</p>
