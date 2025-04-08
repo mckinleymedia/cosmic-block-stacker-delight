@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
@@ -22,7 +23,7 @@ const GameControls: React.FC<GameControlsProps> = ({
   // This happens when the game is paused but hasn't been actively played yet (initial state or after quitting)
   const showNewGameButton = isPaused && !isGameActive;
 
-  return <div className="w-full">
+  return <div className="w-full mt-2">
       <div className="flex flex-col items-center gap-1">
         {/* Up/Rotate button */}
         <div className="flex justify-center mb-1">
@@ -33,7 +34,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         </div>
         
         {/* Left, Down, Right buttons */}
-        <div className="flex justify-center gap-1">
+        <div className="flex justify-center gap-1 mb-4">
           <Button variant="outline" className="p-1 h-16 w-16 aspect-square" onClick={() => onAction('LEFT')} disabled={gameOver || isPaused}>
             <ArrowLeft className="h-7 w-7" />
           </Button>
@@ -90,3 +91,4 @@ const GameControls: React.FC<GameControlsProps> = ({
 };
 
 export default GameControls;
+
