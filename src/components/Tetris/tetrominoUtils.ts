@@ -1,12 +1,18 @@
 
 import { ActiveTetromino, Position, GameState, Direction } from './gameTypes';
-import { BOARD_WIDTH } from './gameConstants';
+import { BOARD_WIDTH, CROSS_BOARD_WIDTH } from './gameConstants';
 import { checkCollision } from './boardUtils';
 import { randomTetromino, TETROMINOS, rotateTetromino as rotateMatrix, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
 
-// Get initial position for a new tetromino
+// Get initial position for a new tetromino in standard mode
 export const getInitialPosition = (): Position => {
   return { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 };
+};
+
+// Get initial position for cross mode - center of the cross
+export const getCrossCenterPosition = (): Position => {
+  // Position at the center of the cross intersection
+  return { x: 0, y: 0 };
 };
 
 // Find the lowest block in each column of the tetromino shape
@@ -43,7 +49,7 @@ export const createTetromino = (type: TetrominoType): ActiveTetromino => {
 // Move tetromino in a direction if possible
 export const moveTetromino = (
   gameState: GameState,
-  direction: Direction // Use Direction type directly
+  direction: Direction
 ): { 
   newTetromino: ActiveTetromino | null, 
   collided: boolean 
@@ -70,7 +76,7 @@ export const moveTetromino = (
         break;
       case 'UP':
         // For 'UP' direction, we invert the y movement (moving up instead of down)
-        if (direction === 'UP' || direction === 'DOWN') newPosition.y -= 1;
+        if (direction === 'UP') newPosition.y -= 1;
         break;
     }
   } else {

@@ -3,12 +3,15 @@
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 
-// Quad mode dimensions - increased by 50% from 88x88 to 132x132
-export const QUAD_BOARD_SIZE = 132;
-export const QUAD_CENTER_SIZE = 8; // Center size (8x8)
-export const QUAD_CENTER_POSITION = {
-  x: Math.floor(QUAD_BOARD_SIZE / 2) - Math.floor(QUAD_CENTER_SIZE / 2),
-  y: Math.floor(QUAD_BOARD_SIZE / 2) - Math.floor(QUAD_CENTER_SIZE / 2)
+// Cross-shaped board dimensions
+export const CROSS_BOARD_WIDTH = 10;  // Width of each arm
+export const CROSS_BOARD_HEIGHT = 44; // Height/length of each arm
+export const CROSS_CENTER_SIZE = 10;  // Size of center intersection
+
+// Center position calculation for cross board
+export const CROSS_CENTER_POSITION = {
+  x: 0,  // Will be calculated based on the cross board dimensions
+  y: 0   // Will be calculated based on the cross board dimensions
 };
 
 // Score per lines cleared

@@ -4,7 +4,7 @@ import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
 import { Button } from '@/components/ui/button';
-import { QUAD_BOARD_SIZE } from './gameConstants';
+import { CROSS_BOARD_WIDTH, CROSS_BOARD_HEIGHT } from './gameConstants';
 
 interface GameBoardProps {
   board: Cell[][];
@@ -100,9 +100,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Render quad mode board (132x132 plus sign shape) with larger cells
-  const cellSize = "w-[4px] h-[4px] sm:w-[5px] sm:h-[5px]"; // Increased from 3px/4px to 4px/5px
-  const centerSize = 8; // 8x8 center
+  // Render cross board mode (two 10x44 rectangles that intersect in the center)
+  const cellSize = "w-[5px] h-[5px] sm:w-[6px] sm:h-[6px]"; // Slightly larger cells
+  const totalWidth = CROSS_BOARD_HEIGHT;
+  const centerOffsetX = Math.floor((CROSS_BOARD_HEIGHT - CROSS_BOARD_WIDTH) / 2);
+  const centerOffsetY = Math.floor((CROSS_BOARD_HEIGHT - CROSS_BOARD_WIDTH) / 2);
   
   return (
     <div className={cn(
@@ -111,83 +113,90 @@ const GameBoard: React.FC<GameBoardProps> = ({
     )}>
       <div className="relative w-fit mx-auto border-2 border-tetris-border rounded" 
            style={{ maxWidth: '100%', maxHeight: '70vh' }}>
-        <div className="grid" style={{ gridTemplateColumns: `repeat(${QUAD_BOARD_SIZE}, minmax(0, 1fr))` }}>
-          {Array.from({ length: QUAD_BOARD_SIZE }).map((_, rowIndex) =>
-            Array.from({ length: QUAD_BOARD_SIZE }).map((_, cellIndex) => {
-              // Determine the center position
-              const centerStart = QUAD_BOARD_SIZE / 2 - centerSize / 2;
-              const centerEnd = centerStart + centerSize;
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
+          {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
+            Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
+              // Determine if this cell is part of the cross shape
+              const isVertical = cellIndex >= centerOffsetX && 
+                               cellIndex < centerOffsetX + CROSS_BOARD_WIDTH;
+              const isHorizontal = rowIndex >= centerOffsetY && 
+                                 rowIndex < centerOffsetY + CROSS_BOARD_WIDTH;
+              const isPartOfCross = isVertical || isHorizontal;
               
-              // Determine if this cell should be part of the plus shape
-              const isCenter = rowIndex >= centerStart && rowIndex < centerEnd && 
-                              cellIndex >= centerStart && cellIndex < centerEnd; // Center 8x8
-              const isVertical = cellIndex >= centerStart && cellIndex < centerEnd && 
-                                (rowIndex < centerStart || rowIndex >= centerEnd); // Vertical line of the plus
-              const isHorizontal = rowIndex >= centerStart && rowIndex < centerEnd && 
-                                  (cellIndex < centerStart || cellIndex >= centerEnd); // Horizontal line of the plus
-              const isPartOfPlus = isCenter || isVertical || isHorizontal;
-              
-              if (!isPartOfPlus) {
-                // Cells not part of the plus are rendered as empty background
+              if (!isPartOfCross) {
+                // Cells not part of the cross are rendered as empty background
                 return (
                   <div 
-                    key={`quad-${rowIndex}-${cellIndex}`}
+                    key={`cross-${rowIndex}-${cellIndex}`}
                     className={`${cellSize} bg-transparent`}
                   />
                 );
               }
               
-              // Map the 132x132 grid to the appropriate segments of our 10x20 board
-              // Center area (8x8 in the middle)
-              if (isCenter) {
-                return (
-                  <div 
-                    key={`quad-${rowIndex}-${cellIndex}`}
-                    className={cn(
-                      cellSize,
-                      "border border-tetris-grid/50",
-                      "bg-tetris-border/30" // Highlighted center area
-                    )}
-                  />
-                );
-              }
-              
-              // Map to regular board positions based on the plus segment
+              // Map the cross board grid to the appropriate segments of our 10x20 board
               let cellContent = { filled: false, color: '' };
               
-              if (isVertical && rowIndex < centerStart) {
-                // Top part of the plus (vertical board, flipped 180 degrees)
-                const boardX = cellIndex - centerStart;
-                const boardY = 19 - (centerStart - rowIndex - 1); // Flipped
-                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
-                  cellContent = renderBoard[boardY][boardX];
+              if (isVertical && !isHorizontal) {
+                // Vertical part of the cross (excluding intersection)
+                const boardX = cellIndex - centerOffsetX;
+                const boardY = rowIndex;
+                
+                // Bottom vertical section (normal orientation)
+                if (rowIndex >= centerOffsetY + CROSS_BOARD_WIDTH) {
+                  const actualY = rowIndex - (centerOffsetY + CROSS_BOARD_WIDTH);
+                  if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
+                  }
+                } 
+                // Top vertical section (flipped)
+                else if (rowIndex < centerOffsetY) {
+                  const actualY = BOARD_HEIGHT - 1 - (centerOffsetY - rowIndex - 1);
+                  if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
+                  }
                 }
-              } else if (isVertical && rowIndex >= centerEnd) {
-                // Bottom part of the plus (vertical board, normal orientation)
-                const boardX = cellIndex - centerStart;
-                const boardY = rowIndex - centerEnd;
-                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
-                  cellContent = renderBoard[boardY][boardX];
+              } else if (isHorizontal && !isVertical) {
+                // Horizontal part of the cross (excluding intersection)
+                const boardX = rowIndex - centerOffsetY;
+                
+                // Right horizontal section
+                if (cellIndex >= centerOffsetX + CROSS_BOARD_WIDTH) {
+                  const actualY = cellIndex - (centerOffsetX + CROSS_BOARD_WIDTH);
+                  if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
+                  }
+                } 
+                // Left horizontal section (flipped)
+                else if (cellIndex < centerOffsetX) {
+                  const actualY = BOARD_HEIGHT - 1 - (centerOffsetX - cellIndex - 1);
+                  if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
+                  }
                 }
-              } else if (isHorizontal && cellIndex < centerStart) {
-                // Left part of the plus (horizontal board, rotated 90 degrees clockwise)
-                const boardX = rowIndex - centerStart;
-                const boardY = 19 - (centerStart - cellIndex - 1); // Flipped
-                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
-                  cellContent = renderBoard[boardY][boardX];
-                }
-              } else if (isHorizontal && cellIndex >= centerEnd) {
-                // Right part of the plus (horizontal board, rotated 270 degrees clockwise)
-                const boardX = rowIndex - centerStart;
-                const boardY = cellIndex - centerEnd;
-                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
-                  cellContent = renderBoard[boardY][boardX];
+              } else if (isVertical && isHorizontal) {
+                // Intersection area - center of the cross
+                const boardX = cellIndex - centerOffsetX;
+                const boardY = rowIndex - centerOffsetY;
+                if (boardY >= 0 && boardY < CROSS_BOARD_WIDTH && boardX >= 0 && boardX < CROSS_BOARD_WIDTH) {
+                  // Center area is just rendered as special highlight
+                  return (
+                    <div 
+                      key={`cross-${rowIndex}-${cellIndex}`}
+                      className={cn(
+                        cellSize,
+                        "border border-tetris-grid/50",
+                        renderBoard[boardY][boardX].filled 
+                          ? renderBoard[boardY][boardX].color 
+                          : "bg-tetris-border/30" // Highlighted center area
+                      )}
+                    />
+                  );
                 }
               }
               
               return (
                 <div 
-                  key={`quad-${rowIndex}-${cellIndex}`}
+                  key={`cross-${rowIndex}-${cellIndex}`}
                   className={cn(
                     cellSize,
                     "border border-tetris-grid/50",

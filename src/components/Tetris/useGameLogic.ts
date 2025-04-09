@@ -5,11 +5,11 @@ import {
   BOARD_WIDTH, 
   calculateDropInterval, 
   getRandomDirection,
-  QUAD_CENTER_POSITION,
-  QUAD_CENTER_SIZE
+  CROSS_BOARD_WIDTH,
+  CROSS_BOARD_HEIGHT
 } from './gameConstants';
 import { createEmptyBoard, checkCollision, updateBoardWithTetromino } from './boardUtils';
-import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino } from './tetrominoUtils';
+import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino, getCrossCenterPosition } from './tetrominoUtils';
 import { randomTetromino, TETROMINOS, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
 
 const createEmptyQuadScores = (): QuadScores => ({
@@ -43,9 +43,9 @@ export const useGameLogic = () => {
     }));
   }, []);
 
-  const getQuadModeInitialPosition = (direction: Direction): { x: number, y: number } => {
-    const centerX = QUAD_CENTER_POSITION.x + Math.floor(QUAD_CENTER_SIZE / 2) - 1;
-    const centerY = QUAD_CENTER_POSITION.y + Math.floor(QUAD_CENTER_SIZE / 2) - 1;
+  const getCrossModeInitialPosition = (direction: Direction): { x: number, y: number } => {
+    const centerX = Math.floor(CROSS_BOARD_WIDTH / 2) - 1;
+    const centerY = Math.floor(CROSS_BOARD_WIDTH / 2) - 1;
     
     return { x: centerX, y: centerY };
   };
@@ -61,7 +61,7 @@ export const useGameLogic = () => {
       ...prev,
       board: initialBoard,
       activeTetromino: prev.quadMode ? 
-        { ...createTetromino(tetrominoType), position: getQuadModeInitialPosition(newDirection), direction: newDirection } : 
+        { ...createTetromino(tetrominoType), position: getCrossModeInitialPosition(newDirection), direction: newDirection } : 
         createTetromino(tetrominoType),
       nextTetromino: nextType,
       nextTetrominoShape: nextShape,
@@ -88,7 +88,7 @@ export const useGameLogic = () => {
         setGameState(prev => ({
           ...prev,
           activeTetromino: prev.quadMode ? 
-            { ...createTetromino(tetrominoType), position: getQuadModeInitialPosition(newDirection), direction: newDirection } : 
+            { ...createTetromino(tetrominoType), position: getCrossModeInitialPosition(newDirection), direction: newDirection } : 
             createTetromino(tetrominoType),
           nextTetromino: nextType,
           nextTetrominoShape: nextShape,
@@ -126,7 +126,7 @@ export const useGameLogic = () => {
     newActiveTetromino.shape = [...gameState.nextTetrominoShape];
     
     if (gameState.quadMode) {
-      newActiveTetromino.position = getQuadModeInitialPosition(newDirection);
+      newActiveTetromino.position = getCrossModeInitialPosition(newDirection);
       newActiveTetromino.direction = newDirection;
     }
     
@@ -196,13 +196,13 @@ export const useGameLogic = () => {
     });
   }, [gameState]);
 
-  const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN') => {
+  const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN' | 'UP') => {
     if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return false;
 
     if (gameState.quadMode && gameState.activeTetromino.direction) {
       const quadDirection = gameState.activeTetromino.direction;
       
-      if (quadDirection === 'UP' && direction === 'DOWN') {
+      if (quadDirection === 'UP' && direction === 'UP') {
         const { newTetromino, collided } = moveTetromino(gameState, 'UP');
         
         if (collided) {
@@ -273,7 +273,7 @@ export const useGameLogic = () => {
       if (updatedActiveTetromino && newQuadMode) {
         updatedActiveTetromino = {
           ...updatedActiveTetromino,
-          position: getQuadModeInitialPosition(newDirection),
+          position: getCrossModeInitialPosition(newDirection),
           direction: newDirection
         };
       } else if (updatedActiveTetromino && !newQuadMode) {
@@ -350,7 +350,7 @@ export const useGameLogic = () => {
       
       if (gameState.quadMode) {
         activeTetromino.direction = newDirection;
-        activeTetromino.position = getQuadModeInitialPosition(newDirection);
+        activeTetromino.position = getCrossModeInitialPosition(newDirection);
       }
       
       const nextType = randomTetromino();
