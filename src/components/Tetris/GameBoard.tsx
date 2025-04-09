@@ -115,13 +115,23 @@ const GameBoard: React.FC<GameBoardProps> = ({
              style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
           {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
             Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
-              // All cells are now rendered with the same style
-              let cellContent = { filled: false, color: '' };
+              // Check if we're in a corner region that should be removed
+              const isTopLeftCorner = rowIndex < 17 && cellIndex < 17;
+              const isTopRightCorner = rowIndex < 17 && cellIndex >= 27;
+              const isBottomLeftCorner = rowIndex >= 27 && cellIndex < 17;
+              const isBottomRightCorner = rowIndex >= 27 && cellIndex >= 27;
               
-              // Only render the active board cells (where gameplay occurs)
+              // Skip rendering cells in the corners
+              if (isTopLeftCorner || isTopRightCorner || isBottomLeftCorner || isBottomRightCorner) {
+                return <div key={`cross-${rowIndex}-${cellIndex}`} className="hidden"></div>;
+              }
+              
+              // For the plus shape - only render vertical and horizontal arms
               const isVertical = cellIndex >= 17 && cellIndex < 27;
               const isHorizontal = rowIndex >= 17 && rowIndex < 27;
               const isPartOfCross = isVertical || isHorizontal;
+              
+              let cellContent = { filled: false, color: '' };
               
               if (isPartOfCross) {
                 if (isVertical && isHorizontal) {
