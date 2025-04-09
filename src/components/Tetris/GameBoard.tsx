@@ -187,7 +187,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   }
   
   // If there's an active tetromino, add it to the special board without duplication
-  if (activeTetromino && gameState.quadMode) {
+  if (activeTetromino && quadMode) {
     const { position, shape, type } = activeTetromino;
     const color = TETROMINOS[type].color;
     
