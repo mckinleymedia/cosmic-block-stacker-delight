@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
@@ -101,23 +100,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Updated cell size
   const cellSize = "w-[10px] h-[10px] sm:w-[12px] sm:h-[12px]";
   
-  // Helper function to determine if a cell should be rendered as part of the plus shape
   const isInPlusShape = (row: number, col: number): boolean => {
-    // Center vertical strip (width 10)
-    if (col >= 17 && col < 27 && (row < 17 || row >= 27)) {
-      return true;
+    if (col >= 17 && col < 27) {
+      if (row < 17) return true;
+      if (row >= 27) return true;
     }
     
-    // Center horizontal strip (height 10)
-    if (row >= 17 && row < 27 && (col < 17 || col >= 27)) {
-      return true;
-    }
-    
-    // Center intersection
-    if (row >= 17 && row < 27 && col >= 17 && col < 27) {
+    if (row >= 17 && row < 27) {
+      if (col < 17) return true;
+      if (col >= 27) return true;
       return true;
     }
     
@@ -135,17 +128,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
              style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
           {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
             Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
-              // Determine if this cell is part of the plus shape
               const isPartOfPlus = isInPlusShape(rowIndex, cellIndex);
               
-              // Skip rendering cells not in the plus shape
               if (!isPartOfPlus) {
                 return <div key={`cross-${rowIndex}-${cellIndex}`} className="hidden"></div>;
               }
               
               let cellContent = { filled: false, color: '' };
               
-              // For the central cross intersection
               if (rowIndex >= 17 && rowIndex < 27 && cellIndex >= 17 && cellIndex < 27) {
                 const boardX = cellIndex - 17;
                 const boardY = rowIndex - 17;
@@ -153,33 +143,27 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   cellContent = renderBoard[boardY][boardX];
                 }
               } else if (cellIndex >= 17 && cellIndex < 27) {
-                // Vertical section
                 const boardX = cellIndex - 17;
                 const boardY = rowIndex;
                 if (rowIndex < 17) {
-                  // Top section
                   const actualY = BOARD_HEIGHT - 17 + rowIndex;
                   if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
                     cellContent = renderBoard[actualY][boardX];
                   }
                 } else if (rowIndex >= 27) {
-                  // Bottom section
                   const actualY = rowIndex - 27;
                   if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
                     cellContent = renderBoard[actualY][boardX];
                   }
                 }
               } else if (rowIndex >= 17 && rowIndex < 27) {
-                // Horizontal section
                 const boardY = rowIndex - 17;
                 if (cellIndex < 17) {
-                  // Left section
                   const boardX = BOARD_WIDTH - 17 + cellIndex;
                   if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
                     cellContent = renderBoard[boardY][boardX];
                   }
                 } else if (cellIndex >= 27) {
-                  // Right section
                   const boardX = cellIndex - 27;
                   if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
                     cellContent = renderBoard[boardY][boardX];
