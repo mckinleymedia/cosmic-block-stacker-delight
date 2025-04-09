@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameAction, ActiveTetromino } from './gameTypes';
 import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
@@ -15,8 +16,7 @@ export const useGameLogic = () => {
     level: 1,
     linesCleared: 0,
     gameOver: false,
-    isPaused: true,
-    quadMode: false // Initialize with quad mode off
+    isPaused: true
   });
 
   // Initialize nextTetrominoShape on first render
@@ -33,8 +33,7 @@ export const useGameLogic = () => {
     const nextType = randomTetromino();
     const nextShape = getRandomlyRotatedShape(nextType);
     
-    setGameState(prev => ({
-      ...prev,
+    setGameState({
       board: initialBoard,
       activeTetromino: createTetromino(tetrominoType),
       nextTetromino: nextType,
@@ -44,7 +43,7 @@ export const useGameLogic = () => {
       linesCleared: 0,
       gameOver: false,
       isPaused: false
-    }));
+    });
   }, []);
 
   const startGame = useCallback(() => {
@@ -69,18 +68,6 @@ export const useGameLogic = () => {
       }
     }
   }, [gameState.isPaused, gameState.activeTetromino]);
-
-  const toggleQuadMode = useCallback(() => {
-    if (gameState.gameOver || !gameState.isPaused) {
-      // Only allow toggling when game is over or paused
-      return;
-    }
-    
-    setGameState(prev => ({
-      ...prev,
-      quadMode: !prev.quadMode
-    }));
-  }, [gameState.gameOver, gameState.isPaused]);
 
   const updateBoard = useCallback(() => {
     if (!gameState.activeTetromino) return;
@@ -203,13 +190,10 @@ export const useGameLogic = () => {
       case 'QUIT':
         quitGame();
         break;
-      case 'TOGGLE_QUAD_MODE':
-        toggleQuadMode();
-        break;
       default:
         break;
     }
-  }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame, toggleQuadMode]);
+  }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame]);
 
   useEffect(() => {
     if (gameState.isPaused || gameState.gameOver) return;
