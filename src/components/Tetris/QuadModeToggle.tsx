@@ -17,7 +17,7 @@ const QuadModeToggle: React.FC<QuadModeToggleProps> = ({
   return (
     <div className="flex items-center justify-between space-x-2 w-full bg-tetris-bg p-2 border-2 border-tetris-border rounded">
       <Label htmlFor="quad-mode" className="text-white font-medium cursor-pointer">
-        Quad Mode
+        4-Way Tetris Mode
       </Label>
       <Switch
         id="quad-mode"

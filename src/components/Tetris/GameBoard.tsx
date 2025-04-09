@@ -53,94 +53,68 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   }
 
+  // Function to render a tetris board with specific orientation
+  const renderTetrisBoard = (board: Cell[][], rotation: 0 | 90 | 180 | 270) => {
+    // Create copies for different orientations
+    const orientedBoard = [...board];
+    
+    return (
+      <div className={`grid grid-cols-10 ${rotation === 90 ? 'rotate-90' : rotation === 180 ? 'rotate-180' : rotation === 270 ? '-rotate-90' : ''}`}>
+        {orientedBoard.map((row, rowIndex) =>
+          row.map((cell, cellIndex) => (
+            <div 
+              key={`${rotation}-${rowIndex}-${cellIndex}`}
+              className={cn(
+                "w-3 h-3 sm:w-4 sm:h-4 border border-tetris-grid",
+                cell.filled ? cell.color : "bg-tetris-bg"
+              )}
+            />
+          ))
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={cn(
       "relative border-2 border-tetris-border rounded overflow-hidden",
       (gameOver || isPaused) && "opacity-60"
     )}>
       {quadMode ? (
-        <div className="grid grid-cols-30 gap-1">
-          {/* Simplified quad mode visualization - would need proper implementation */}
-          <div className="col-span-10 col-start-11">
-            <div className="grid grid-cols-10">
-              {renderBoard.slice(0, 10).map((row, rowIndex) =>
-                row.map((cell, cellIndex) => (
-                  <div 
-                    key={`top-${rowIndex}-${cellIndex}`}
-                    className={cn(
-                      "w-4 h-4 border border-tetris-grid",
-                      cell.filled ? cell.color : "bg-tetris-bg"
-                    )}
-                  />
-                ))
-              )}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 p-2 bg-tetris-bg">
+          {/* Empty cell in top-left */}
+          <div className="hidden md:block"></div>
+          
+          {/* Top Tetris (180° rotation) */}
+          <div className="flex justify-center items-center">
+            {renderTetrisBoard(renderBoard, 180)}
           </div>
           
-          <div className="col-span-30 grid grid-cols-30 gap-1">
-            <div className="col-span-10">
-              <div className="grid grid-cols-10">
-                {renderBoard.slice(10, 20).map((row, rowIndex) =>
-                  row.map((cell, cellIndex) => (
-                    <div 
-                      key={`left-${rowIndex}-${cellIndex}`}
-                      className={cn(
-                        "w-4 h-4 border border-tetris-grid",
-                        cell.filled ? cell.color : "bg-tetris-bg"
-                      )}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-            
-            <div className="col-span-10">
-              <div className="grid grid-cols-10">
-                {renderBoard.map((row, rowIndex) =>
-                  row.map((cell, cellIndex) => (
-                    <div 
-                      key={`main-${rowIndex}-${cellIndex}`}
-                      className={cn(
-                        "w-4 h-4 sm:w-6 sm:h-6 border border-tetris-grid",
-                        cell.filled ? cell.color : "bg-tetris-bg"
-                      )}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-            
-            <div className="col-span-10">
-              <div className="grid grid-cols-10">
-                {renderBoard.slice(10, 20).map((row, rowIndex) =>
-                  row.map((cell, cellIndex) => (
-                    <div 
-                      key={`right-${rowIndex}-${cellIndex}`}
-                      className={cn(
-                        "w-4 h-4 border border-tetris-grid",
-                        cell.filled ? cell.color : "bg-tetris-bg"
-                      )}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
+          {/* Empty cell in top-right */}
+          <div className="hidden md:block"></div>
+          
+          {/* Left Tetris (90° rotation) */}
+          <div className="hidden md:flex justify-center items-center">
+            {renderTetrisBoard(renderBoard, 90)}
           </div>
           
-          <div className="col-span-10 col-start-11">
-            <div className="grid grid-cols-10">
-              {renderBoard.slice(0, 10).map((row, rowIndex) =>
-                row.map((cell, cellIndex) => (
-                  <div 
-                    key={`bottom-${rowIndex}-${cellIndex}`}
-                    className={cn(
-                      "w-4 h-4 border border-tetris-grid",
-                      cell.filled ? cell.color : "bg-tetris-bg"
-                    )}
-                  />
-                ))
-              )}
-            </div>
+          {/* Center/Main Tetris */}
+          <div className="flex justify-center items-center">
+            {renderTetrisBoard(renderBoard, 0)}
+          </div>
+          
+          {/* Right Tetris (270° rotation) */}
+          <div className="hidden md:flex justify-center items-center">
+            {renderTetrisBoard(renderBoard, 270)}
+          </div>
+          
+          {/* Mobile version - simplified with just two boards */}
+          <div className="flex md:hidden justify-center items-center">
+            {renderTetrisBoard(renderBoard, 90)}
+          </div>
+          
+          <div className="flex md:hidden justify-center items-center">
+            {renderTetrisBoard(renderBoard, 270)}
           </div>
         </div>
       ) : (
