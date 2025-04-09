@@ -99,103 +99,81 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Render quad mode board (plus sign shape)
-  const cellSize = "w-6 h-6 sm:w-8 sm:h-8";
+  // Render quad mode board (44x44 plus sign shape)
+  const cellSize = "w-2 h-2 sm:w-2 sm:h-2"; // Smaller cells for the 44x44 grid
 
   return (
     <div className={cn(
-      "relative overflow-hidden",
+      "relative overflow-hidden mx-auto",
       (gameOver || isPaused) && "opacity-60"
     )}>
-      {/* This is the container for the quad-board */}
-      <div className="relative w-fit mx-auto" style={{ height: '580px', width: '580px' }}>
-        {/* Center 4x4 grid where all boards meet */}
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40">
-          <div className="grid grid-cols-4">
-            {Array(4).fill(null).map((_, rowIndex) =>
-              Array(4).fill(null).map((_, cellIndex) => (
+      {/* This is the container for the 44x44 quad-board */}
+      <div className="relative w-fit mx-auto" style={{ height: '88vh', width: '88vw', maxWidth: '88vh', maxHeight: '88vw' }}>
+        {/* Create a board that's 44x44 segments in size */}
+        <div className="grid grid-cols-44 gap-0 border-2 border-tetris-border rounded">
+          {Array.from({ length: 44 }).map((_, rowIndex) =>
+            Array.from({ length: 44 }).map((_, cellIndex) => {
+              // Determine if this cell is filled based on our board data
+              // For simplicity, we're checking if the cell is within the bounds of our actual data
+              const isCenterArea = rowIndex >= 20 && rowIndex < 24 && cellIndex >= 20 && cellIndex < 24;
+              
+              // Check if the cell is filled from the renderBoard
+              let cellContent = { filled: false, color: '' };
+              
+              // Map the 44x44 grid to the appropriate segments of our 10x20 board
+              // Center area (4x4 in the middle)
+              if (isCenterArea) {
+                cellContent = {
+                  filled: false,
+                  color: 'bg-tetris-border/30' // Highlighted center area
+                };
+              }
+              // Top segment (vertical board, flipped 180 degrees)
+              else if (cellIndex >= 17 && cellIndex < 27 && rowIndex < 20) {
+                const boardX = cellIndex - 17;
+                const boardY = 19 - rowIndex; // Flipped
+                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
+                  cellContent = renderBoard[boardY][boardX];
+                }
+              }
+              // Bottom segment (vertical board, normal orientation)
+              else if (cellIndex >= 17 && cellIndex < 27 && rowIndex >= 24) {
+                const boardX = cellIndex - 17;
+                const boardY = rowIndex - 24;
+                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
+                  cellContent = renderBoard[boardY][boardX];
+                }
+              }
+              // Left segment (horizontal board, rotated 90 degrees clockwise)
+              else if (rowIndex >= 17 && rowIndex < 27 && cellIndex < 20) {
+                const boardX = rowIndex - 17;
+                const boardY = 19 - (cellIndex); // Flipped
+                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
+                  cellContent = renderBoard[boardY][boardX];
+                }
+              }
+              // Right segment (horizontal board, rotated 270 degrees clockwise)
+              else if (rowIndex >= 17 && rowIndex < 27 && cellIndex >= 24) {
+                const boardX = rowIndex - 17;
+                const boardY = cellIndex - 24;
+                if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
+                  cellContent = renderBoard[boardY][boardX];
+                }
+              }
+              
+              return (
                 <div 
-                  key={`center-${rowIndex}-${cellIndex}`}
+                  key={`quad-${rowIndex}-${cellIndex}`}
                   className={cn(
                     cellSize,
-                    "border border-tetris-grid bg-tetris-bg"
+                    "border border-tetris-grid/50",
+                    cellContent.filled ? cellContent.color : "bg-tetris-bg",
+                    isCenterArea ? "bg-tetris-border/30" : ""
                   )}
                 />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Bottom board (standard orientation) */}
-        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 border-2 border-tetris-border rounded z-30">
-          <div className="grid grid-cols-10">
-            {renderBoard.map((row, rowIndex) =>
-              row.map((cell, cellIndex) => (
-                <div 
-                  key={`bottom-${rowIndex}-${cellIndex}`}
-                  className={cn(
-                    cellSize,
-                    "border border-tetris-grid",
-                    cell.filled ? cell.color : "bg-tetris-bg"
-                  )}
-                />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Left board (rotated 90 degrees clockwise) */}
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 rotate-90 border-2 border-tetris-border rounded z-20">
-          <div className="grid grid-cols-10">
-            {renderBoard.map((row, rowIndex) =>
-              row.map((cell, cellIndex) => (
-                <div 
-                  key={`left-${rowIndex}-${cellIndex}`}
-                  className={cn(
-                    cellSize,
-                    "border border-tetris-grid",
-                    cell.filled ? cell.color : "bg-tetris-bg"
-                  )}
-                />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Top board (rotated 180 degrees) */}
-        <div className="absolute left-1/2 top-0 transform -translate-x-1/2 rotate-180 border-2 border-tetris-border rounded z-10">
-          <div className="grid grid-cols-10">
-            {renderBoard.map((row, rowIndex) =>
-              row.map((cell, cellIndex) => (
-                <div 
-                  key={`top-${rowIndex}-${cellIndex}`}
-                  className={cn(
-                    cellSize,
-                    "border border-tetris-grid",
-                    cell.filled ? cell.color : "bg-tetris-bg"
-                  )}
-                />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Right board (rotated 270 degrees clockwise) */}
-        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 -rotate-90 border-2 border-tetris-border rounded z-0">
-          <div className="grid grid-cols-10">
-            {renderBoard.map((row, rowIndex) =>
-              row.map((cell, cellIndex) => (
-                <div 
-                  key={`right-${rowIndex}-${cellIndex}`}
-                  className={cn(
-                    cellSize,
-                    "border border-tetris-grid",
-                    cell.filled ? cell.color : "bg-tetris-bg"
-                  )}
-                />
-              ))
-            )}
-          </div>
+              );
+            })
+          )}
         </div>
 
         {/* Game Over and Pause overlays */}

@@ -1,5 +1,5 @@
 
-import { ActiveTetromino, Position, GameState } from './gameTypes';
+import { ActiveTetromino, Position, GameState, Direction } from './gameTypes';
 import { BOARD_WIDTH } from './gameConstants';
 import { checkCollision } from './boardUtils';
 import { randomTetromino, TETROMINOS, rotateTetromino as rotateMatrix, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
@@ -43,7 +43,7 @@ export const createTetromino = (type: TetrominoType): ActiveTetromino => {
 // Move tetromino in a direction if possible
 export const moveTetromino = (
   gameState: GameState,
-  direction: 'LEFT' | 'RIGHT' | 'DOWN'
+  direction: 'LEFT' | 'RIGHT' | 'DOWN' | 'UP' // Added 'UP' for quad mode
 ): { 
   newTetromino: ActiveTetromino | null, 
   collided: boolean 
@@ -52,15 +52,38 @@ export const moveTetromino = (
     return { newTetromino: null, collided: false };
   }
 
-  const { position, shape } = gameState.activeTetromino;
+  const { position, shape, direction: tetrominoDirection } = gameState.activeTetromino;
   let newPosition = { ...position };
 
-  if (direction === 'LEFT') {
-    newPosition.x -= 1;
-  } else if (direction === 'RIGHT') {
-    newPosition.x += 1;
-  } else if (direction === 'DOWN') {
-    newPosition.y += 1;
+  // In quad mode, movement depends on the tetromino's assigned direction
+  if (gameState.quadMode && tetrominoDirection) {
+    // Each tetromino can only move in its assigned direction in quad mode
+    switch (tetrominoDirection) {
+      case 'LEFT':
+        if (direction === 'LEFT') newPosition.x -= 1;
+        break;
+      case 'RIGHT':
+        if (direction === 'RIGHT') newPosition.x += 1;
+        break;
+      case 'DOWN':
+        if (direction === 'DOWN') newPosition.y += 1;
+        break;
+      case 'UP':
+        // For 'UP' direction, we invert the y movement (moving up instead of down)
+        if (direction === 'UP') newPosition.y -= 1;
+        break;
+    }
+  } else {
+    // Standard movement for normal mode
+    if (direction === 'LEFT') {
+      newPosition.x -= 1;
+    } else if (direction === 'RIGHT') {
+      newPosition.x += 1;
+    } else if (direction === 'DOWN') {
+      newPosition.y += 1;
+    } else if (direction === 'UP') {
+      newPosition.y -= 1; // This is mainly for quad mode
+    }
   }
 
   const hasCollision = checkCollision(newPosition, shape, gameState.board);
@@ -73,7 +96,7 @@ export const moveTetromino = (
       },
       collided: false
     };
-  } else if (direction === 'DOWN') {
+  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && direction === 'UP')) {
     return { newTetromino: gameState.activeTetromino, collided: true };
   }
   

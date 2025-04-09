@@ -11,10 +11,13 @@ export type Position = {
   y: number;
 };
 
+export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+
 export type ActiveTetromino = {
   type: TetrominoType;
   position: Position;
   shape: number[][];
+  direction?: Direction; // Direction for quad mode
 };
 
 export type GameState = {
@@ -28,6 +31,7 @@ export type GameState = {
   gameOver: boolean;
   isPaused: boolean;
   quadMode: boolean; // Add quad mode flag
+  quadDirection?: Direction; // Current direction in quad mode
 };
 
 export type GameAction = 
