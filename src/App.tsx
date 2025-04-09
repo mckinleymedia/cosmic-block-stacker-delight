@@ -7,12 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import LeaderboardPage from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
-import { useState } from "react";
+import { createContext } from "react";
+
+// Create the QueryClient outside of the component
+const queryClient = new QueryClient();
 
 const App = () => {
-  // Create a new QueryClient instance inside the component
-  const [queryClient] = useState(() => new QueryClient());
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
