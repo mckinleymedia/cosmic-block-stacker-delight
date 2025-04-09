@@ -111,12 +111,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
   // Quad mode rendering with intersecting centers
   return (
     <div className={cn(
-      "relative border-2 border-tetris-border rounded overflow-hidden",
+      "relative border-2 border-tetris-border rounded overflow-hidden w-[320px] h-[640px] sm:w-[400px] sm:h-[800px]",
       (gameOver || isPaused) && "opacity-60"
     )}>
       <div className="relative w-full h-full bg-tetris-bg">
         {/* Center board area */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-tetris-bg">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
           <div className="grid grid-cols-4 gap-0">
             {Array.from({ length: 4 }).map((_, rowIndex) =>
               Array.from({ length: 4 }).map((_, cellIndex) => {
@@ -135,7 +135,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         {/* Down direction (normal) */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-[240px] sm:w-[320px]">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-[16px] sm:translate-y-[32px] w-[240px] sm:w-[320px]">
           <div className="grid grid-cols-10">
             {renderBoard.slice(midY + 2).map((row, rowIndex) =>
               row.map((cell, cellIndex) => renderCell(cell, rowIndex + midY + 2, cellIndex))
@@ -144,7 +144,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         {/* Up direction (180° rotation) */}
-        <div className="absolute bottom-1/2 left-1/2 transform -translate-x-1/2 rotate-180 w-[240px] sm:w-[320px]">
+        <div className="absolute bottom-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[16px] sm:-translate-y-[32px] rotate-180 w-[240px] sm:w-[320px]">
           <div className="grid grid-cols-10">
             {renderBoard.slice(0, midY - 2).reverse().map((row, rowIndex) =>
               row.map((cell, cellIndex) => renderCell(cell, midY - 3 - rowIndex, cellIndex))
@@ -153,7 +153,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         {/* Left direction (90° rotation) */}
-        <div className="absolute top-1/2 right-1/2 transform translate-y-[-50%] rotate-90 origin-right w-[240px] sm:w-[320px]">
+        <div className="absolute top-1/2 right-1/2 transform translate-y-[-50%] -translate-x-[16px] sm:-translate-x-[32px] rotate-90 origin-right w-[240px] sm:w-[320px]">
           <div className="grid grid-cols-10">
             {renderBoard.map((row, rowIndex) =>
               row.slice(0, midX - 2).reverse().map((cell, cellIndex) => 
@@ -164,7 +164,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         {/* Right direction (270° rotation) */}
-        <div className="absolute top-1/2 left-1/2 transform translate-y-[-50%] -rotate-90 origin-left w-[240px] sm:w-[320px]">
+        <div className="absolute top-1/2 left-1/2 transform translate-y-[-50%] translate-x-[16px] sm:translate-x-[32px] -rotate-90 origin-left w-[240px] sm:w-[320px]">
           <div className="grid grid-cols-10">
             {renderBoard.map((row, rowIndex) =>
               row.slice(midX + 2).map((cell, cellIndex) => 
