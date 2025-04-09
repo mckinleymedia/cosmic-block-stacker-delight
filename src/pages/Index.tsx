@@ -25,7 +25,7 @@ const Index = () => {
           className="ml-20 text-white/70 hover:text-white hover:bg-tetris-border/20 bg-transparent"
           onClick={() => setShowLeaderboard(true)}
         >
-          <Trophy className="h-10 w-10 text-yellow-500" />
+          <Trophy className="h-8 w-8 text-yellow-500" />
           <span className="sr-only">Leaderboard</span>
         </Button>
       </div>
