@@ -1,6 +1,6 @@
 
 import { BOARD_HEIGHT, BOARD_WIDTH, POINTS } from './gameConstants';
-import { Cell, ActiveTetromino, GameState, Position, Direction, QuadScores } from './gameTypes';
+import { Cell, ActiveTetromino, GameState, Position } from './gameTypes';
 import { TETROMINOS } from './tetrominos';
 
 // Create an empty board
@@ -50,10 +50,7 @@ export const updateBoardWithTetromino = (
 ): { 
   newBoard: Cell[][], 
   linesCleared: number, 
-  pointsScored: number,
-  quadDirection?: Direction,
-  quadLinesCleared?: Partial<QuadScores>,
-  quadPointsScored?: Partial<QuadScores>
+  pointsScored: number 
 } => {
   if (!gameState.activeTetromino) {
     return { 
@@ -63,7 +60,7 @@ export const updateBoardWithTetromino = (
     };
   }
 
-  const { position, shape, type, direction } = gameState.activeTetromino;
+  const { position, shape, type } = gameState.activeTetromino;
   const newBoard = JSON.parse(JSON.stringify(gameState.board));
   
   // Place the tetromino on the board
@@ -103,26 +100,6 @@ export const updateBoardWithTetromino = (
   const pointsScored = completedLines.length > 0 
     ? POINTS[completedLines.length as keyof typeof POINTS] * gameState.level
     : 0;
-  
-  // For quad mode, track which direction gets the points
-  if (gameState.quadMode && direction) {
-    const quadLinesCleared: Partial<QuadScores> = {};
-    const quadPointsScored: Partial<QuadScores> = {};
-    
-    if (completedLines.length > 0) {
-      quadLinesCleared[direction.toLowerCase() as keyof QuadScores] = completedLines.length;
-      quadPointsScored[direction.toLowerCase() as keyof QuadScores] = pointsScored;
-    }
-    
-    return {
-      newBoard,
-      linesCleared: completedLines.length,
-      pointsScored: gameState.quadMode ? 0 : pointsScored, // In quad mode, we use separate scoring
-      quadDirection: direction,
-      quadLinesCleared,
-      quadPointsScored
-    };
-  }
   
   return {
     newBoard,

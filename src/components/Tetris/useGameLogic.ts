@@ -1,24 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, GameAction, ActiveTetromino, Direction, QuadScores } from './gameTypes';
-import { 
-  BOARD_HEIGHT, 
-  BOARD_WIDTH, 
-  calculateDropInterval, 
-  getRandomDirection,
-  CROSS_BOARD_WIDTH,
-  CROSS_BOARD_HEIGHT
-} from './gameConstants';
+import { GameState, GameAction, ActiveTetromino } from './gameTypes';
+import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
 import { createEmptyBoard, checkCollision, updateBoardWithTetromino } from './boardUtils';
-import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino, getCrossCenterPosition } from './tetrominoUtils';
+import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino } from './tetrominoUtils';
 import { randomTetromino, TETROMINOS, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
-
-const createEmptyQuadScores = (): QuadScores => ({
-  up: 0,
-  down: 0,
-  left: 0,
-  right: 0
-});
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -30,13 +16,10 @@ export const useGameLogic = () => {
     level: 1,
     linesCleared: 0,
     gameOver: false,
-    isPaused: true,
-    quadMode: false, // Initialize quad mode as false
-    quadDirection: 'DOWN', // Default direction
-    quadScores: createEmptyQuadScores(), // Initialize quad scores
-    quadLinesCleared: createEmptyQuadScores() // Initialize quad lines cleared
+    isPaused: true
   });
 
+  // Initialize nextTetrominoShape on first render
   useEffect(() => {
     setGameState(prev => ({
       ...prev,
@@ -44,37 +27,23 @@ export const useGameLogic = () => {
     }));
   }, []);
 
-  const getCrossModeInitialPosition = (direction: Direction): { x: number, y: number } => {
-    // Use the center of the board as the initial position in quad mode
-    // Note: In the actual board rendering, we'll add the center offset (17,17)
-    return { x: 0, y: 0 };
-  };
-
   const initializeGame = useCallback(() => {
     const initialBoard = createEmptyBoard();
     const tetrominoType = randomTetromino();
     const nextType = randomTetromino();
     const nextShape = getRandomlyRotatedShape(nextType);
-    const newDirection = getRandomDirection();
     
-    setGameState((prev) => ({
-      ...prev,
+    setGameState({
       board: initialBoard,
-      activeTetromino: prev.quadMode ? 
-        { ...createTetromino(tetrominoType), position: getCrossModeInitialPosition(newDirection), direction: newDirection } : 
-        createTetromino(tetrominoType),
+      activeTetromino: createTetromino(tetrominoType),
       nextTetromino: nextType,
       nextTetrominoShape: nextShape,
       score: 0,
       level: 1,
       linesCleared: 0,
       gameOver: false,
-      isPaused: false,
-      quadMode: prev.quadMode,
-      quadDirection: newDirection,
-      quadScores: createEmptyQuadScores(),
-      quadLinesCleared: createEmptyQuadScores()
-    }));
+      isPaused: false
+    });
   }, []);
 
   const startGame = useCallback(() => {
@@ -83,17 +52,13 @@ export const useGameLogic = () => {
         const tetrominoType = randomTetromino();
         const nextType = randomTetromino();
         const nextShape = getRandomlyRotatedShape(nextType);
-        const newDirection = getRandomDirection();
         
         setGameState(prev => ({
           ...prev,
-          activeTetromino: prev.quadMode ? 
-            { ...createTetromino(tetrominoType), position: getCrossModeInitialPosition(newDirection), direction: newDirection } : 
-            createTetromino(tetrominoType),
+          activeTetromino: createTetromino(tetrominoType),
           nextTetromino: nextType,
           nextTetrominoShape: nextShape,
-          isPaused: false,
-          quadDirection: newDirection
+          isPaused: false
         }));
       } else {
         setGameState(prev => ({
@@ -107,123 +72,49 @@ export const useGameLogic = () => {
   const updateBoard = useCallback(() => {
     if (!gameState.activeTetromino) return;
 
-    const { 
-      newBoard, 
-      linesCleared, 
-      pointsScored, 
-      quadDirection, 
-      quadLinesCleared, 
-      quadPointsScored 
-    } = updateBoardWithTetromino(gameState);
+    const { newBoard, linesCleared, pointsScored } = updateBoardWithTetromino(gameState);
     
     const newLinesCleared = gameState.linesCleared + linesCleared;
     const newLevel = Math.floor(newLinesCleared / 10) + 1;
     
-    const newTetrominoType = gameState.nextTetromino;
-    const newDirection = getRandomDirection();
-    
-    const newActiveTetromino = createTetromino(newTetrominoType);
+    // Create a new active tetromino from the next tetromino
+    const newActiveTetromino = createTetromino(gameState.nextTetromino);
+    // Use the preselected shape for the next tetromino
     newActiveTetromino.shape = [...gameState.nextTetrominoShape];
     
-    if (gameState.quadMode) {
-      newActiveTetromino.position = getCrossModeInitialPosition(newDirection);
-      newActiveTetromino.direction = newDirection;
-    }
-    
+    // Generate the next tetromino and its shape
     const nextType = randomTetromino();
     const nextShape = getRandomlyRotatedShape(nextType);
     
+    // Check if game over
     if (checkCollision(newActiveTetromino.position, newActiveTetromino.shape, newBoard)) {
-      setGameState(prev => {
-        let newQuadScores = {...prev.quadScores};
-        let newQuadLinesCleared = {...prev.quadLinesCleared};
-        
-        if (prev.quadMode && quadDirection && quadPointsScored) {
-          const dirKey = quadDirection.toLowerCase() as keyof QuadScores;
-          if (quadPointsScored[dirKey]) {
-            newQuadScores[dirKey] = (prev.quadScores[dirKey] || 0) + (quadPointsScored[dirKey] || 0);
-          }
-          
-          if (quadLinesCleared && quadLinesCleared[dirKey]) {
-            newQuadLinesCleared[dirKey] = (prev.quadLinesCleared[dirKey] || 0) + (quadLinesCleared[dirKey] || 0);
-          }
-        }
-        
-        return {
-          ...prev,
-          board: newBoard,
-          activeTetromino: null,
-          gameOver: true,
-          isPaused: true,
-          score: prev.score + (prev.quadMode ? 0 : pointsScored),
-          linesCleared: newLinesCleared,
-          level: newLevel,
-          quadScores: newQuadScores,
-          quadLinesCleared: newQuadLinesCleared
-        };
-      });
+      setGameState(prev => ({
+        ...prev,
+        board: newBoard,
+        activeTetromino: null,
+        gameOver: true,
+        isPaused: true,
+        score: prev.score + pointsScored,
+        linesCleared: newLinesCleared,
+        level: newLevel
+      }));
       return;
     }
     
-    setGameState(prev => {
-      let newQuadScores = {...prev.quadScores};
-      let newQuadLinesCleared = {...prev.quadLinesCleared};
-      
-      if (prev.quadMode && quadDirection && quadPointsScored) {
-        const dirKey = quadDirection.toLowerCase() as keyof QuadScores;
-        if (quadPointsScored[dirKey]) {
-          newQuadScores[dirKey] = (prev.quadScores[dirKey] || 0) + (quadPointsScored[dirKey] || 0);
-        }
-        
-        if (quadLinesCleared && quadLinesCleared[dirKey]) {
-          newQuadLinesCleared[dirKey] = (prev.quadLinesCleared[dirKey] || 0) + (quadLinesCleared[dirKey] || 0);
-        }
-      }
-      
-      return {
-        ...prev,
-        board: newBoard,
-        activeTetromino: newActiveTetromino,
-        nextTetromino: nextType,
-        nextTetrominoShape: nextShape,
-        score: prev.score + (prev.quadMode ? 0 : pointsScored),
-        linesCleared: newLinesCleared,
-        level: newLevel,
-        quadDirection: newDirection,
-        quadScores: newQuadScores,
-        quadLinesCleared: newQuadLinesCleared
-      };
-    });
+    setGameState(prev => ({
+      ...prev,
+      board: newBoard,
+      activeTetromino: newActiveTetromino,
+      nextTetromino: nextType,
+      nextTetrominoShape: nextShape,
+      score: prev.score + pointsScored,
+      linesCleared: newLinesCleared,
+      level: newLevel
+    }));
   }, [gameState]);
 
-  const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN' | 'UP') => {
+  const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN') => {
     if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return false;
-
-    if (gameState.quadMode && gameState.activeTetromino.direction) {
-      const quadDirection = gameState.activeTetromino.direction;
-      
-      if (quadDirection === 'UP' && direction === 'UP') {
-        const { newTetromino, collided } = moveTetromino(gameState, 'UP');
-        
-        if (collided) {
-          updateBoard();
-          return false;
-        } else if (newTetromino) {
-          setGameState(prev => ({
-            ...prev,
-            activeTetromino: newTetromino
-          }));
-          return true;
-        }
-        return false;
-      }
-      
-      if ((quadDirection === 'LEFT' && direction !== 'LEFT') ||
-          (quadDirection === 'RIGHT' && direction !== 'RIGHT') ||
-          (quadDirection === 'DOWN' && direction !== 'DOWN')) {
-        return false;
-      }
-    }
 
     const { newTetromino, collided } = moveTetromino(gameState, direction);
     
@@ -263,38 +154,6 @@ export const useGameLogic = () => {
     }));
   }, [gameState.gameOver]);
 
-  const toggleQuadMode = useCallback(() => {
-    setGameState(prev => {
-      const newQuadMode = !prev.quadMode;
-      const newDirection = getRandomDirection();
-      
-      let updatedActiveTetromino = prev.activeTetromino;
-      
-      if (updatedActiveTetromino && newQuadMode) {
-        updatedActiveTetromino = {
-          ...updatedActiveTetromino,
-          position: getCrossModeInitialPosition(newDirection),
-          direction: newDirection
-        };
-      } else if (updatedActiveTetromino && !newQuadMode) {
-        updatedActiveTetromino = {
-          ...updatedActiveTetromino,
-          position: getInitialPosition(),
-          direction: undefined
-        };
-      }
-      
-      return {
-        ...prev,
-        quadMode: newQuadMode,
-        quadDirection: newDirection,
-        activeTetromino: updatedActiveTetromino,
-        quadScores: createEmptyQuadScores(),
-        quadLinesCleared: createEmptyQuadScores()
-      };
-    });
-  }, []);
-
   const restartGame = useCallback(() => {
     initializeGame();
   }, [initializeGame]);
@@ -331,27 +190,18 @@ export const useGameLogic = () => {
       case 'QUIT':
         quitGame();
         break;
-      case 'TOGGLE_QUAD_MODE':
-        toggleQuadMode();
-        break;
       default:
         break;
     }
-  }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame, toggleQuadMode]);
+  }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame]);
 
   useEffect(() => {
     if (gameState.isPaused || gameState.gameOver) return;
     
     if (!gameState.activeTetromino && !gameState.isPaused && !gameState.gameOver) {
-      const newDirection = getRandomDirection();
       const activeTetromino = createTetromino(gameState.nextTetromino);
-      
+      // Use the preselected shape for the next tetromino
       activeTetromino.shape = [...gameState.nextTetrominoShape];
-      
-      if (gameState.quadMode) {
-        activeTetromino.direction = newDirection;
-        activeTetromino.position = getCrossModeInitialPosition(newDirection);
-      }
       
       const nextType = randomTetromino();
       const nextShape = getRandomlyRotatedShape(nextType);
@@ -360,8 +210,7 @@ export const useGameLogic = () => {
         ...prev,
         activeTetromino,
         nextTetromino: nextType,
-        nextTetrominoShape: nextShape,
-        quadDirection: newDirection
+        nextTetrominoShape: nextShape
       }));
       return;
     }
@@ -370,22 +219,9 @@ export const useGameLogic = () => {
       console.log("Drop interval executed", gameState.activeTetromino?.position);
       
       if (gameState.activeTetromino) {
-        if (gameState.quadMode && gameState.activeTetromino.direction === 'UP') {
-          const { newTetromino, collided } = moveTetromino(gameState, 'UP');
-          
-          if (collided) {
-            updateBoard();
-          } else if (newTetromino) {
-            setGameState(prev => ({
-              ...prev,
-              activeTetromino: newTetromino
-            }));
-          }
-        } else {
-          const moveResult = moveTetrominoAction('DOWN');
-          if (!moveResult) {
-            console.log("Piece locked, generating new piece");
-          }
+        const moveResult = moveTetrominoAction('DOWN');
+        if (!moveResult) {
+          console.log("Piece locked, generating new piece");
         }
       }
     }, calculateDropInterval(gameState.level));
@@ -400,9 +236,7 @@ export const useGameLogic = () => {
     moveTetrominoAction,
     gameState.level,
     gameState.nextTetromino,
-    gameState.nextTetrominoShape,
-    gameState.quadMode,
-    updateBoard
+    gameState.nextTetrominoShape
   ]);
 
   useEffect(() => {
@@ -459,10 +293,6 @@ export const useGameLogic = () => {
         case 'Q':
           handleGameAction('QUIT');
           break;
-        case 't':
-        case 'T':
-          handleGameAction('TOGGLE_QUAD_MODE');
-          break;
         default:
           break;
       }
@@ -472,7 +302,7 @@ export const useGameLogic = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [gameState, handleGameAction, restartGame, startGame, togglePause, toggleQuadMode]);
+  }, [gameState, handleGameAction, restartGame, startGame, togglePause]);
 
   useEffect(() => {
     const initialBoard = createEmptyBoard();

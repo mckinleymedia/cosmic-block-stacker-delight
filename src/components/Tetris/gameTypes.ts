@@ -11,20 +11,10 @@ export type Position = {
   y: number;
 };
 
-export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
-
 export type ActiveTetromino = {
   type: TetrominoType;
   position: Position;
   shape: number[][];
-  direction?: Direction; // Direction for quad mode
-};
-
-export type QuadScores = {
-  up: number;
-  down: number;
-  left: number;
-  right: number;
 };
 
 export type GameState = {
@@ -37,10 +27,6 @@ export type GameState = {
   linesCleared: number;
   gameOver: boolean;
   isPaused: boolean;
-  quadMode: boolean; // Add quad mode flag
-  quadDirection?: Direction; // Current direction in quad mode
-  quadScores: QuadScores; // Separate scores for each quad direction
-  quadLinesCleared: QuadScores; // Separate lines cleared for each quad direction
 };
 
 export type GameAction = 
@@ -50,8 +36,7 @@ export type GameAction =
   | 'ROTATE' 
   | 'PAUSE' 
   | 'RESTART'
-  | 'QUIT'
-  | 'TOGGLE_QUAD_MODE'; // Add toggle quad mode action
+  | 'QUIT';
 
 export type LeaderboardEntry = {
   id: string;
