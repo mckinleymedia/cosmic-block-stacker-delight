@@ -4,14 +4,14 @@ export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 
 // Cross-shaped board dimensions
-export const CROSS_BOARD_WIDTH = 10;  // Width of each arm
-export const CROSS_BOARD_HEIGHT = 44; // Total height/width of the board area
+export const CROSS_BOARD_WIDTH = 30;  // Total width of the board area
+export const CROSS_BOARD_HEIGHT = 40; // Total height of the board area
 export const CROSS_CENTER_SIZE = 10;  // Size of center intersection
 
 // Center position calculation for cross board
 export const CROSS_CENTER_POSITION = {
-  x: 17,  // Center x-coordinate in the cross board
-  y: 17   // Center y-coordinate in the cross board
+  x: 10,  // Center x-coordinate in the cross board
+  y: 15   // Center y-coordinate in the cross board
 };
 
 // Score per lines cleared

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
@@ -108,44 +107,58 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   const cellSize = "w-[10px] h-[10px] sm:w-[12px] sm:h-[12px]";
   
-  const isInCustomShape = (row: number, col: number): boolean => {
-    const centerX = Math.floor(CROSS_BOARD_HEIGHT / 2);
+  // Function to determine if a cell is part of the plus shape
+  const isInPlusShape = (row: number, col: number): boolean => {
+    const centerX = Math.floor(CROSS_BOARD_WIDTH / 2);
     const centerY = Math.floor(CROSS_BOARD_HEIGHT / 2);
     
-    // Vertical arm of the plus
-    if (col >= centerX - 5 && col < centerX + 5) {
-      return true; // All rows in the center 10 columns
+    // Width of the vertical bar of the plus
+    const verticalBarWidth = 10; 
+    // Height of the horizontal bar of the plus
+    const horizontalBarHeight = 10;
+    
+    // Calculate the boundaries of the vertical bar
+    const verticalBarStart = centerX - Math.floor(verticalBarWidth / 2);
+    const verticalBarEnd = verticalBarStart + verticalBarWidth;
+    
+    // Calculate the boundaries of the horizontal bar
+    const horizontalBarStart = centerY - Math.floor(horizontalBarHeight / 2);
+    const horizontalBarEnd = horizontalBarStart + horizontalBarHeight;
+    
+    // Check if the cell is within the vertical bar
+    if (col >= verticalBarStart && col < verticalBarEnd) {
+      return true;
     }
     
-    // Horizontal arm of the plus
-    if (row >= centerY - 5 && row < centerY + 5) {
-      return true; // All columns in the center 10 rows
+    // Check if the cell is within the horizontal bar
+    if (row >= horizontalBarStart && row < horizontalBarEnd) {
+      return true;
     }
     
     return false;
   };
   
-  // Create an empty special board for the plus shape
-  const specialRenderBoard: (Cell | null)[][] = Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => 
-    Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => null)
+  // Create an empty board for the plus-shaped area
+  const plusShapeBoard: (Cell | null)[][] = Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => 
+    Array.from({ length: CROSS_BOARD_WIDTH }).map(() => null)
   );
   
-  // Map each cell of the game board to the correct position in the plus board
+  // Map the regular board cells to the plus-shaped board
   for (let rowIndex = 0; rowIndex < BOARD_HEIGHT; rowIndex++) {
     for (let cellIndex = 0; cellIndex < BOARD_WIDTH; cellIndex++) {
-      let cellContent = renderBoard[rowIndex][cellIndex];
+      const cellContent = renderBoard[rowIndex][cellIndex];
       
-      // Calculate the position in the plus board
-      let crossRow = rowIndex + 17; // Center offset
-      let crossCol = cellIndex + 17; // Center offset
+      // Calculate position in the plus-shaped board (centered)
+      const plusRow = rowIndex + Math.floor((CROSS_BOARD_HEIGHT - BOARD_HEIGHT) / 2);
+      const plusCol = cellIndex + Math.floor((CROSS_BOARD_WIDTH - BOARD_WIDTH) / 2);
       
-      if (isInCustomShape(crossRow, crossCol)) {
-        specialRenderBoard[crossRow][crossCol] = cellContent;
+      if (isInPlusShape(plusRow, plusCol)) {
+        plusShapeBoard[plusRow][plusCol] = cellContent;
       }
     }
   }
   
-  // If there's an active tetromino, add it to the special board without duplication
+  // If there's an active tetromino, add it to the plus-shaped board
   if (activeTetromino && quadMode) {
     const { position, shape, type } = activeTetromino;
     const color = TETROMINOS[type].color;
@@ -153,17 +166,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x] !== 0) {
-          const crossRow = position.y + y + 17; // Center offset
-          const crossCol = position.x + x + 17; // Center offset
+          // Calculate position in the plus-shaped board
+          const plusRow = position.y + y + Math.floor((CROSS_BOARD_HEIGHT - BOARD_HEIGHT) / 2);
+          const plusCol = position.x + x + Math.floor((CROSS_BOARD_WIDTH - BOARD_WIDTH) / 2);
           
           if (
-            crossRow >= 0 && 
-            crossRow < CROSS_BOARD_HEIGHT && 
-            crossCol >= 0 && 
-            crossCol < CROSS_BOARD_HEIGHT &&
-            isInCustomShape(crossRow, crossCol)
+            plusRow >= 0 && 
+            plusRow < CROSS_BOARD_HEIGHT && 
+            plusCol >= 0 && 
+            plusCol < CROSS_BOARD_WIDTH &&
+            isInPlusShape(plusRow, plusCol)
           ) {
-            specialRenderBoard[crossRow][crossCol] = {
+            plusShapeBoard[plusRow][plusCol] = {
               filled: true,
               color: color
             };
@@ -181,20 +195,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
       <div className="relative w-fit mx-auto border-2 border-tetris-border rounded" 
            style={{ maxWidth: '100%', maxHeight: '70vh' }}>
         <div className="grid" 
-             style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
+             style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_WIDTH}, minmax(0, 1fr))` }}>
           {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
-            Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
-              const isPartOfShape = isInCustomShape(rowIndex, cellIndex);
-              
-              if (!isPartOfShape) {
-                return <div key={`cross-${rowIndex}-${cellIndex}`} className="hidden"></div>;
+            Array.from({ length: CROSS_BOARD_WIDTH }).map((_, colIndex) => {
+              // Only render cells that are part of the plus shape
+              if (!isInPlusShape(rowIndex, colIndex)) {
+                return <div key={`plus-${rowIndex}-${colIndex}`} className="hidden"></div>;
               }
               
-              const cellContent = specialRenderBoard[rowIndex][cellIndex] || { filled: false, color: '' };
+              const cellContent = plusShapeBoard[rowIndex][colIndex] || { filled: false, color: '' };
               
               return (
                 <div 
-                  key={`cross-${rowIndex}-${cellIndex}`}
+                  key={`plus-${rowIndex}-${colIndex}`}
                   className={cn(
                     cellSize,
                     "border border-tetris-grid/50",
