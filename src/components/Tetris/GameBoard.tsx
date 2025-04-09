@@ -128,15 +128,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                             ? renderBoard[boardY][boardX] 
                             : { filled: false, color: '' };
                 
-                return (
-                  <div 
-                    key={`center-${rowIndex}-${cellIndex}`}
-                    className={cn(
-                      "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
-                      cell.filled ? cell.color : "bg-tetris-bg"
-                    )}
-                  />
-                );
+                return renderCell(cell, boardY, boardX);
               })
             )}
           </div>
