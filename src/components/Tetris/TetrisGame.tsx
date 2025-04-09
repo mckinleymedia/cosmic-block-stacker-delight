@@ -8,6 +8,7 @@ import GameStats from './GameStats';
 import GameControls from './GameControls';
 import ScoreSubmissionDialog from './ScoreSubmissionDialog';
 import LeaderboardModal from './LeaderboardModal';
+import QuadModeToggle from './QuadModeToggle';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Trophy } from 'lucide-react';
@@ -34,6 +35,10 @@ const TetrisGame: React.FC = () => {
   
   const handleQuit = useCallback(() => {
     handleGameAction('QUIT');
+  }, [handleGameAction]);
+  
+  const handleQuadModeToggle = useCallback(() => {
+    handleGameAction('TOGGLE_QUAD_MODE');
   }, [handleGameAction]);
   
   // Check for high score when game ends
@@ -67,6 +72,7 @@ const TetrisGame: React.FC = () => {
         activeTetromino={gameHasStarted ? gameState.activeTetromino : null}
         gameOver={showGameOver} 
         isPaused={gameState.isPaused && gameHasStarted && !gameState.gameOver}
+        quadMode={gameState.quadMode}
         onQuit={handleQuit}
       />
       
@@ -83,6 +89,11 @@ const TetrisGame: React.FC = () => {
           score={gameState.score} 
           level={gameState.level} 
           linesCleared={gameState.linesCleared} 
+        />
+        
+        <QuadModeToggle
+          enabled={gameState.quadMode}
+          onToggle={handleQuadModeToggle}
         />
         
         <GameControls 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameAction, ActiveTetromino } from './gameTypes';
 import { BOARD_HEIGHT, BOARD_WIDTH, calculateDropInterval } from './gameConstants';
@@ -16,7 +15,8 @@ export const useGameLogic = () => {
     level: 1,
     linesCleared: 0,
     gameOver: false,
-    isPaused: true
+    isPaused: true,
+    quadMode: false // Initialize quad mode as false
   });
 
   // Initialize nextTetrominoShape on first render
@@ -33,7 +33,8 @@ export const useGameLogic = () => {
     const nextType = randomTetromino();
     const nextShape = getRandomlyRotatedShape(nextType);
     
-    setGameState({
+    setGameState((prev) => ({
+      ...prev,
       board: initialBoard,
       activeTetromino: createTetromino(tetrominoType),
       nextTetromino: nextType,
@@ -42,8 +43,9 @@ export const useGameLogic = () => {
       level: 1,
       linesCleared: 0,
       gameOver: false,
-      isPaused: false
-    });
+      isPaused: false,
+      quadMode: prev.quadMode
+    }));
   }, []);
 
   const startGame = useCallback(() => {
@@ -154,6 +156,13 @@ export const useGameLogic = () => {
     }));
   }, [gameState.gameOver]);
 
+  const toggleQuadMode = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      quadMode: !prev.quadMode
+    }));
+  }, []);
+
   const restartGame = useCallback(() => {
     initializeGame();
   }, [initializeGame]);
@@ -190,10 +199,13 @@ export const useGameLogic = () => {
       case 'QUIT':
         quitGame();
         break;
+      case 'TOGGLE_QUAD_MODE':
+        toggleQuadMode();
+        break;
       default:
         break;
     }
-  }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame]);
+  }, [moveTetrominoAction, rotatePieceAction, togglePause, restartGame, quitGame, toggleQuadMode]);
 
   useEffect(() => {
     if (gameState.isPaused || gameState.gameOver) return;
@@ -293,6 +305,10 @@ export const useGameLogic = () => {
         case 'Q':
           handleGameAction('QUIT');
           break;
+        case 't':
+        case 'T':
+          handleGameAction('TOGGLE_QUAD_MODE');
+          break;
         default:
           break;
       }
@@ -302,7 +318,7 @@ export const useGameLogic = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [gameState, handleGameAction, restartGame, startGame, togglePause]);
+  }, [gameState, handleGameAction, restartGame, startGame, togglePause, toggleQuadMode]);
 
   useEffect(() => {
     const initialBoard = createEmptyBoard();
