@@ -109,74 +109,33 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const cellSize = "w-[10px] h-[10px] sm:w-[12px] sm:h-[12px]";
   
   const isInCustomShape = (row: number, col: number): boolean => {
-    const centerColStart = 17;
-    const centerColEnd = 27;
+    const centerX = Math.floor(CROSS_BOARD_HEIGHT / 2);
+    const centerY = Math.floor(CROSS_BOARD_HEIGHT / 2);
     
-    const centerRowStart = 17;
-    const centerRowEnd = 27;
-    
-    // Define the plus shape pattern
-    if (col >= centerColStart && col < centerColEnd) {
-      if (row < centerRowStart) {
-        return row >= centerRowStart - 17;
-      }
-      if (row >= centerRowEnd) {
-        return row < centerRowEnd + 17;
-      }
+    // Vertical arm of the plus
+    if (col >= centerX - 5 && col < centerX + 5) {
+      return true; // All rows in the center 10 columns
     }
     
-    if (row >= centerRowStart && row < centerRowEnd && col < centerColStart) {
-      return col >= centerColStart - 17;
-    }
-    
-    if (row >= centerRowStart && row < centerRowEnd && col >= centerColEnd) {
-      return col < centerColEnd + 17;
-    }
-    
-    // Check corners
-    if (row < centerRowStart && col < centerColStart) {
-      const verticalDistance = centerRowStart - row;
-      const horizontalDistance = centerColStart - col;
-      return verticalDistance <= 17 && horizontalDistance <= 10;
-    }
-    
-    if (row < centerRowStart && col >= centerColEnd) {
-      const verticalDistance = centerRowStart - row;
-      const horizontalDistance = col - centerColEnd + 1;
-      return verticalDistance <= 10 && horizontalDistance <= 17;
-    }
-    
-    if (row >= centerRowEnd && col < centerColStart) {
-      const verticalDistance = row - centerRowEnd + 1;
-      const horizontalDistance = centerColStart - col;
-      return verticalDistance <= 10 && horizontalDistance <= 17;
-    }
-    
-    if (row >= centerRowEnd && col >= centerColEnd) {
-      const verticalDistance = row - centerRowEnd + 1;
-      const horizontalDistance = col - centerColEnd + 1;
-      return verticalDistance <= 17 && horizontalDistance <= 10;
-    }
-    
-    if (row >= centerRowStart && row < centerRowEnd && col >= centerColStart && col < centerColEnd) {
-      return true;
+    // Horizontal arm of the plus
+    if (row >= centerY - 5 && row < centerY + 5) {
+      return true; // All columns in the center 10 rows
     }
     
     return false;
   };
   
-  // Create an empty special board for the cross shape
+  // Create an empty special board for the plus shape
   const specialRenderBoard: (Cell | null)[][] = Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => 
     Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => null)
   );
   
-  // Map each cell of the game board to the correct position in the cross board
-  // Only process cells once to prevent duplicates
+  // Map each cell of the game board to the correct position in the plus board
   for (let rowIndex = 0; rowIndex < BOARD_HEIGHT; rowIndex++) {
     for (let cellIndex = 0; cellIndex < BOARD_WIDTH; cellIndex++) {
       let cellContent = renderBoard[rowIndex][cellIndex];
       
-      // Calculate the position in the cross board
+      // Calculate the position in the plus board
       let crossRow = rowIndex + 17; // Center offset
       let crossCol = cellIndex + 17; // Center offset
       
