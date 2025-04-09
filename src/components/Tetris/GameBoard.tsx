@@ -4,6 +4,7 @@ import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
 import { Button } from '@/components/ui/button';
+import { QUAD_BOARD_SIZE } from './gameConstants';
 
 interface GameBoardProps {
   board: Cell[][];
@@ -99,9 +100,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Render quad mode board (44x44 plus sign shape)
-  const cellSize = "w-[6px] h-[6px] sm:w-[8px] sm:h-[8px]"; // Smaller cells for the 44x44 grid
-
+  // Render quad mode board (88x88 plus sign shape)
+  const cellSize = "w-[4px] h-[4px] sm:w-[5px] sm:h-[5px]"; // Smaller cells for the larger 88x88 grid
+  const centerSize = 8; // 8x8 center (doubled from previous 4x4)
+  
   return (
     <div className={cn(
       "relative overflow-hidden mx-auto",
@@ -109,13 +111,20 @@ const GameBoard: React.FC<GameBoardProps> = ({
     )}>
       <div className="relative w-fit mx-auto border-2 border-tetris-border rounded" 
            style={{ maxWidth: '100%', maxHeight: '70vh' }}>
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(44, minmax(0, 1fr))' }}>
-          {Array.from({ length: 44 }).map((_, rowIndex) =>
-            Array.from({ length: 44 }).map((_, cellIndex) => {
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${QUAD_BOARD_SIZE}, minmax(0, 1fr))` }}>
+          {Array.from({ length: QUAD_BOARD_SIZE }).map((_, rowIndex) =>
+            Array.from({ length: QUAD_BOARD_SIZE }).map((_, cellIndex) => {
+              // Determine the center position
+              const centerStart = QUAD_BOARD_SIZE / 2 - centerSize / 2;
+              const centerEnd = centerStart + centerSize;
+              
               // Determine if this cell should be part of the plus shape
-              const isCenter = rowIndex >= 20 && rowIndex < 24 && cellIndex >= 20 && cellIndex < 24; // Center 4x4
-              const isVertical = cellIndex >= 20 && cellIndex < 24 && (rowIndex < 20 || rowIndex >= 24); // Vertical line of the plus
-              const isHorizontal = rowIndex >= 20 && rowIndex < 24 && (cellIndex < 20 || cellIndex >= 24); // Horizontal line of the plus
+              const isCenter = rowIndex >= centerStart && rowIndex < centerEnd && 
+                              cellIndex >= centerStart && cellIndex < centerEnd; // Center 8x8
+              const isVertical = cellIndex >= centerStart && cellIndex < centerEnd && 
+                                (rowIndex < centerStart || rowIndex >= centerEnd); // Vertical line of the plus
+              const isHorizontal = rowIndex >= centerStart && rowIndex < centerEnd && 
+                                  (cellIndex < centerStart || cellIndex >= centerEnd); // Horizontal line of the plus
               const isPartOfPlus = isCenter || isVertical || isHorizontal;
               
               if (!isPartOfPlus) {
@@ -128,8 +137,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 );
               }
               
-              // Map the 44x44 grid to the appropriate segments of our 10x20 board
-              // Center area (4x4 in the middle)
+              // Map the 88x88 grid to the appropriate segments of our 10x20 board
+              // Center area (8x8 in the middle)
               if (isCenter) {
                 return (
                   <div 
@@ -146,31 +155,31 @@ const GameBoard: React.FC<GameBoardProps> = ({
               // Map to regular board positions based on the plus segment
               let cellContent = { filled: false, color: '' };
               
-              if (isVertical && rowIndex < 20) {
+              if (isVertical && rowIndex < centerStart) {
                 // Top part of the plus (vertical board, flipped 180 degrees)
-                const boardX = cellIndex - 20;
-                const boardY = 19 - rowIndex; // Flipped
+                const boardX = cellIndex - centerStart;
+                const boardY = 19 - (centerStart - rowIndex - 1); // Flipped
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }
-              } else if (isVertical && rowIndex >= 24) {
+              } else if (isVertical && rowIndex >= centerEnd) {
                 // Bottom part of the plus (vertical board, normal orientation)
-                const boardX = cellIndex - 20;
-                const boardY = rowIndex - 24;
+                const boardX = cellIndex - centerStart;
+                const boardY = rowIndex - centerEnd;
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }
-              } else if (isHorizontal && cellIndex < 20) {
+              } else if (isHorizontal && cellIndex < centerStart) {
                 // Left part of the plus (horizontal board, rotated 90 degrees clockwise)
-                const boardX = rowIndex - 20;
-                const boardY = 19 - cellIndex; // Flipped
+                const boardX = rowIndex - centerStart;
+                const boardY = 19 - (centerStart - cellIndex - 1); // Flipped
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }
-              } else if (isHorizontal && cellIndex >= 24) {
+              } else if (isHorizontal && cellIndex >= centerEnd) {
                 // Right part of the plus (horizontal board, rotated 270 degrees clockwise)
-                const boardX = rowIndex - 20;
-                const boardY = cellIndex - 24;
+                const boardX = rowIndex - centerStart;
+                const boardY = cellIndex - centerEnd;
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }

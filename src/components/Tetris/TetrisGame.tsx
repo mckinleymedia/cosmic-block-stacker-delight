@@ -5,6 +5,7 @@ import { useLeaderboard } from '@/hooks/use-leaderboard';
 import GameBoard from './GameBoard';
 import NextPiece from './NextPiece';
 import GameStats from './GameStats';
+import QuadModeStats from './QuadModeStats';
 import GameControls from './GameControls';
 import ScoreSubmissionDialog from './ScoreSubmissionDialog';
 import LeaderboardModal from './LeaderboardModal';
@@ -33,6 +34,10 @@ const TetrisGame: React.FC = () => {
                             gameState.activeTetromino !== null || 
                             gameState.board.some(row => row.some(cell => cell.filled));
   
+  // Calculate total quad score
+  const totalQuadScore = gameState.quadScores.up + gameState.quadScores.down + 
+                         gameState.quadScores.left + gameState.quadScores.right;
+  
   const handleQuit = useCallback(() => {
     handleGameAction('QUIT');
   }, [handleGameAction]);
@@ -53,7 +58,10 @@ const TetrisGame: React.FC = () => {
   
   // Submit score handler
   const handleSubmitScore = (playerName: string) => {
-    addScore(gameState.score, gameState.level, gameState.linesCleared, playerName);
+    // If in quad mode, use the total quad score
+    const finalScore = gameState.quadMode ? totalQuadScore : gameState.score;
+    
+    addScore(finalScore, gameState.level, gameState.linesCleared, playerName);
     setShowScoreDialog(false);
     setScoreSubmitted(true);
   };
@@ -85,11 +93,18 @@ const TetrisGame: React.FC = () => {
           />
         </div>
         
-        <GameStats 
-          score={gameState.score} 
-          level={gameState.level} 
-          linesCleared={gameState.linesCleared} 
-        />
+        {gameState.quadMode ? (
+          <QuadModeStats 
+            scores={gameState.quadScores}
+            linesCleared={gameState.quadLinesCleared}
+          />
+        ) : (
+          <GameStats 
+            score={gameState.score} 
+            level={gameState.level} 
+            linesCleared={gameState.linesCleared} 
+          />
+        )}
         
         <QuadModeToggle
           enabled={gameState.quadMode}
@@ -117,7 +132,7 @@ const TetrisGame: React.FC = () => {
         isOpen={showScoreDialog}
         onClose={() => setShowScoreDialog(false)}
         onSubmit={handleSubmitScore}
-        score={gameState.score}
+        score={gameState.quadMode ? totalQuadScore : gameState.score}
       />
       
       <LeaderboardModal

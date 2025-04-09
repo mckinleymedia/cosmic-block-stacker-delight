@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, GameAction, ActiveTetromino, Direction } from './gameTypes';
+import { GameState, GameAction, ActiveTetromino, Direction, QuadScores } from './gameTypes';
 import { 
   BOARD_HEIGHT, 
   BOARD_WIDTH, 
@@ -11,6 +11,13 @@ import {
 import { createEmptyBoard, checkCollision, updateBoardWithTetromino } from './boardUtils';
 import { moveTetromino, rotateTetromino, getInitialPosition, createTetromino } from './tetrominoUtils';
 import { randomTetromino, TETROMINOS, TetrominoType, getRandomlyRotatedShape } from './tetrominos';
+
+const createEmptyQuadScores = (): QuadScores => ({
+  up: 0,
+  down: 0,
+  left: 0,
+  right: 0
+});
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -24,7 +31,9 @@ export const useGameLogic = () => {
     gameOver: false,
     isPaused: true,
     quadMode: false, // Initialize quad mode as false
-    quadDirection: 'DOWN' // Default direction
+    quadDirection: 'DOWN', // Default direction
+    quadScores: createEmptyQuadScores(), // Initialize quad scores
+    quadLinesCleared: createEmptyQuadScores() // Initialize quad lines cleared
   });
 
   // Initialize nextTetrominoShape on first render
@@ -43,13 +52,13 @@ export const useGameLogic = () => {
     // Adjust position based on direction
     switch (direction) {
       case 'UP': 
-        return { x: baseX, y: baseY - 4 }; // Place above center
+        return { x: baseX, y: baseY - 8 }; // Double the offset
       case 'DOWN': 
-        return { x: baseX, y: baseY + 1 }; // Place below center
+        return { x: baseX, y: baseY + 2 }; // Doubled
       case 'LEFT': 
-        return { x: baseX - 4, y: baseY }; // Place to the left of center
+        return { x: baseX - 8, y: baseY }; // Double the offset
       case 'RIGHT': 
-        return { x: baseX + 1, y: baseY }; // Place to the right of center
+        return { x: baseX + 2, y: baseY }; // Doubled
       default:
         return { x: baseX, y: baseY };
     }
@@ -76,7 +85,9 @@ export const useGameLogic = () => {
       gameOver: false,
       isPaused: false,
       quadMode: prev.quadMode,
-      quadDirection: newDirection
+      quadDirection: newDirection,
+      quadScores: createEmptyQuadScores(),
+      quadLinesCleared: createEmptyQuadScores()
     }));
   }, []);
 
@@ -110,7 +121,14 @@ export const useGameLogic = () => {
   const updateBoard = useCallback(() => {
     if (!gameState.activeTetromino) return;
 
-    const { newBoard, linesCleared, pointsScored } = updateBoardWithTetromino(gameState);
+    const { 
+      newBoard, 
+      linesCleared, 
+      pointsScored, 
+      quadDirection, 
+      quadLinesCleared, 
+      quadPointsScored 
+    } = updateBoardWithTetromino(gameState);
     
     const newLinesCleared = gameState.linesCleared + linesCleared;
     const newLevel = Math.floor(newLinesCleared / 10) + 1;
@@ -135,30 +153,68 @@ export const useGameLogic = () => {
     
     // Check if game over
     if (checkCollision(newActiveTetromino.position, newActiveTetromino.shape, newBoard)) {
-      setGameState(prev => ({
-        ...prev,
-        board: newBoard,
-        activeTetromino: null,
-        gameOver: true,
-        isPaused: true,
-        score: prev.score + pointsScored,
-        linesCleared: newLinesCleared,
-        level: newLevel
-      }));
+      setGameState(prev => {
+        // Update quad scores if in quad mode
+        let newQuadScores = {...prev.quadScores};
+        let newQuadLinesCleared = {...prev.quadLinesCleared};
+        
+        if (prev.quadMode && quadDirection && quadPointsScored) {
+          const dirKey = quadDirection.toLowerCase() as keyof QuadScores;
+          if (quadPointsScored[dirKey]) {
+            newQuadScores[dirKey] = (prev.quadScores[dirKey] || 0) + (quadPointsScored[dirKey] || 0);
+          }
+          
+          if (quadLinesCleared && quadLinesCleared[dirKey]) {
+            newQuadLinesCleared[dirKey] = (prev.quadLinesCleared[dirKey] || 0) + (quadLinesCleared[dirKey] || 0);
+          }
+        }
+        
+        return {
+          ...prev,
+          board: newBoard,
+          activeTetromino: null,
+          gameOver: true,
+          isPaused: true,
+          score: prev.score + (prev.quadMode ? 0 : pointsScored),
+          linesCleared: newLinesCleared,
+          level: newLevel,
+          quadScores: newQuadScores,
+          quadLinesCleared: newQuadLinesCleared
+        };
+      });
       return;
     }
     
-    setGameState(prev => ({
-      ...prev,
-      board: newBoard,
-      activeTetromino: newActiveTetromino,
-      nextTetromino: nextType,
-      nextTetrominoShape: nextShape,
-      score: prev.score + pointsScored,
-      linesCleared: newLinesCleared,
-      level: newLevel,
-      quadDirection: newDirection
-    }));
+    setGameState(prev => {
+      // Update quad scores if in quad mode
+      let newQuadScores = {...prev.quadScores};
+      let newQuadLinesCleared = {...prev.quadLinesCleared};
+      
+      if (prev.quadMode && quadDirection && quadPointsScored) {
+        const dirKey = quadDirection.toLowerCase() as keyof QuadScores;
+        if (quadPointsScored[dirKey]) {
+          newQuadScores[dirKey] = (prev.quadScores[dirKey] || 0) + (quadPointsScored[dirKey] || 0);
+        }
+        
+        if (quadLinesCleared && quadLinesCleared[dirKey]) {
+          newQuadLinesCleared[dirKey] = (prev.quadLinesCleared[dirKey] || 0) + (quadLinesCleared[dirKey] || 0);
+        }
+      }
+      
+      return {
+        ...prev,
+        board: newBoard,
+        activeTetromino: newActiveTetromino,
+        nextTetromino: nextType,
+        nextTetrominoShape: nextShape,
+        score: prev.score + (prev.quadMode ? 0 : pointsScored),
+        linesCleared: newLinesCleared,
+        level: newLevel,
+        quadDirection: newDirection,
+        quadScores: newQuadScores,
+        quadLinesCleared: newQuadLinesCleared
+      };
+    });
   }, [gameState]);
 
   const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN') => {
@@ -248,7 +304,10 @@ export const useGameLogic = () => {
         ...prev,
         quadMode: newQuadMode,
         quadDirection: newDirection,
-        activeTetromino: updatedActiveTetromino
+        activeTetromino: updatedActiveTetromino,
+        // Reset quad scores when toggling mode
+        quadScores: createEmptyQuadScores(),
+        quadLinesCleared: createEmptyQuadScores()
       };
     });
   }, []);

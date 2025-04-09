@@ -20,6 +20,13 @@ export type ActiveTetromino = {
   direction?: Direction; // Direction for quad mode
 };
 
+export type QuadScores = {
+  up: number;
+  down: number;
+  left: number;
+  right: number;
+};
+
 export type GameState = {
   board: Cell[][];
   activeTetromino: ActiveTetromino | null;
@@ -32,6 +39,8 @@ export type GameState = {
   isPaused: boolean;
   quadMode: boolean; // Add quad mode flag
   quadDirection?: Direction; // Current direction in quad mode
+  quadScores: QuadScores; // Separate scores for each quad direction
+  quadLinesCleared: QuadScores; // Separate lines cleared for each quad direction
 };
 
 export type GameAction = 
