@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { GameState, GameAction, ActiveTetromino, Direction, QuadScores } from './gameTypes';
 import { 
@@ -44,10 +45,9 @@ export const useGameLogic = () => {
   }, []);
 
   const getCrossModeInitialPosition = (direction: Direction): { x: number, y: number } => {
-    const centerX = Math.floor(CROSS_BOARD_WIDTH / 2) - 1;
-    const centerY = Math.floor(CROSS_BOARD_WIDTH / 2) - 1;
-    
-    return { x: centerX, y: centerY };
+    // Use the center of the board as the initial position in quad mode
+    // Note: In the actual board rendering, we'll add the center offset (17,17)
+    return { x: 0, y: 0 };
   };
 
   const initializeGame = useCallback(() => {

@@ -10,8 +10,8 @@ export const CROSS_CENTER_SIZE = 10;  // Size of center intersection
 
 // Center position calculation for cross board
 export const CROSS_CENTER_POSITION = {
-  x: 0,  // Will be calculated based on the cross board dimensions
-  y: 0   // Will be calculated based on the cross board dimensions
+  x: 17,  // Center x-coordinate in the cross board
+  y: 17   // Center y-coordinate in the cross board
 };
 
 // Score per lines cleared

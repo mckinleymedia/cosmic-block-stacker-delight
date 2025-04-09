@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
@@ -27,18 +28,22 @@ const GameBoard: React.FC<GameBoardProps> = ({
   quadMode = false,
   onQuit
 }) => {
+  // Create a new copy of the board for rendering
   const renderBoard = JSON.parse(JSON.stringify(board));
   
+  // Add the active tetromino to the render board only if one exists
   if (activeTetromino) {
     const { position, shape, type } = activeTetromino;
     const color = TETROMINOS[type].color;
     
+    // Only add the tetromino shape to the render board once
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x] !== 0) {
           const boardY = position.y + y;
           const boardX = position.x + x;
           
+          // Only render cells that are within the board boundaries
           if (
             boardY >= 0 && 
             boardY < renderBoard.length && 
@@ -55,6 +60,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   }
 
+  // Standard tetris board rendering
   if (!quadMode) {
     return (
       <div className={cn(
@@ -109,6 +115,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const centerRowStart = 17;
     const centerRowEnd = 27;
     
+    // Define the plus shape pattern
     if (col >= centerColStart && col < centerColEnd) {
       if (row < centerRowStart) {
         return row >= centerRowStart - 17;
@@ -126,6 +133,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       return col < centerColEnd + 17;
     }
     
+    // Check corners
     if (row < centerRowStart && col < centerColStart) {
       const verticalDistance = centerRowStart - row;
       const horizontalDistance = centerColStart - col;
@@ -157,6 +165,55 @@ const GameBoard: React.FC<GameBoardProps> = ({
     return false;
   };
   
+  // Create an empty special board for the cross shape
+  const specialRenderBoard: (Cell | null)[][] = Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => 
+    Array.from({ length: CROSS_BOARD_HEIGHT }).map(() => null)
+  );
+  
+  // Map each cell of the game board to the correct position in the cross board
+  // Only process cells once to prevent duplicates
+  for (let rowIndex = 0; rowIndex < BOARD_HEIGHT; rowIndex++) {
+    for (let cellIndex = 0; cellIndex < BOARD_WIDTH; cellIndex++) {
+      let cellContent = renderBoard[rowIndex][cellIndex];
+      
+      // Calculate the position in the cross board
+      let crossRow = rowIndex + 17; // Center offset
+      let crossCol = cellIndex + 17; // Center offset
+      
+      if (isInCustomShape(crossRow, crossCol)) {
+        specialRenderBoard[crossRow][crossCol] = cellContent;
+      }
+    }
+  }
+  
+  // If there's an active tetromino, add it to the special board without duplication
+  if (activeTetromino && gameState.quadMode) {
+    const { position, shape, type } = activeTetromino;
+    const color = TETROMINOS[type].color;
+    
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] !== 0) {
+          const crossRow = position.y + y + 17; // Center offset
+          const crossCol = position.x + x + 17; // Center offset
+          
+          if (
+            crossRow >= 0 && 
+            crossRow < CROSS_BOARD_HEIGHT && 
+            crossCol >= 0 && 
+            crossCol < CROSS_BOARD_HEIGHT &&
+            isInCustomShape(crossRow, crossCol)
+          ) {
+            specialRenderBoard[crossRow][crossCol] = {
+              filled: true,
+              color: color
+            };
+          }
+        }
+      }
+    }
+  }
+  
   return (
     <div className={cn(
       "relative overflow-hidden mx-auto",
@@ -174,42 +231,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 return <div key={`cross-${rowIndex}-${cellIndex}`} className="hidden"></div>;
               }
               
-              let cellContent = { filled: false, color: '' };
-              
-              if (rowIndex >= 17 && rowIndex < 27 && cellIndex >= 17 && cellIndex < 27) {
-                const boardX = cellIndex - 17;
-                const boardY = rowIndex - 17;
-                if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-                  cellContent = renderBoard[boardY][boardX];
-                }
-              } else if (cellIndex >= 17 && cellIndex < 27) {
-                const boardX = cellIndex - 17;
-                const boardY = rowIndex;
-                if (rowIndex < 17) {
-                  const actualY = BOARD_HEIGHT - 17 + rowIndex;
-                  if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[actualY][boardX];
-                  }
-                } else if (rowIndex >= 27) {
-                  const actualY = rowIndex - 27;
-                  if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[actualY][boardX];
-                  }
-                }
-              } else if (rowIndex >= 17 && rowIndex < 27) {
-                const boardY = rowIndex - 17;
-                if (cellIndex < 17) {
-                  const boardX = BOARD_WIDTH - 17 + cellIndex;
-                  if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[boardY][boardX];
-                  }
-                } else if (cellIndex >= 27) {
-                  const boardX = cellIndex - 27;
-                  if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[boardY][boardX];
-                  }
-                }
-              }
+              const cellContent = specialRenderBoard[rowIndex][cellIndex] || { filled: false, color: '' };
               
               return (
                 <div 
