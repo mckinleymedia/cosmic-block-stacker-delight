@@ -70,7 +70,7 @@ export const moveTetromino = (
         break;
       case 'UP':
         // For 'UP' direction, we invert the y movement (moving up instead of down)
-        if (direction === 'UP') newPosition.y -= 1;
+        if (direction === 'UP' || direction === 'DOWN') newPosition.y -= 1;
         break;
     }
   } else {
@@ -96,7 +96,7 @@ export const moveTetromino = (
       },
       collided: false
     };
-  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && direction === 'UP')) {
+  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && (direction === 'UP' || direction === 'DOWN'))) {
     return { newTetromino: gameState.activeTetromino, collided: true };
   }
   

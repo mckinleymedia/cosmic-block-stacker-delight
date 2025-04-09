@@ -36,7 +36,6 @@ export const useGameLogic = () => {
     quadLinesCleared: createEmptyQuadScores() // Initialize quad lines cleared
   });
 
-  // Initialize nextTetrominoShape on first render
   useEffect(() => {
     setGameState(prev => ({
       ...prev,
@@ -45,23 +44,10 @@ export const useGameLogic = () => {
   }, []);
 
   const getQuadModeInitialPosition = (direction: Direction): { x: number, y: number } => {
-    // Position the tetromino in the center of the quad board
-    const baseX = QUAD_CENTER_POSITION.x + Math.floor(QUAD_CENTER_SIZE / 2) - 1;
-    const baseY = QUAD_CENTER_POSITION.y + Math.floor(QUAD_CENTER_SIZE / 2) - 1;
+    const centerX = QUAD_CENTER_POSITION.x + Math.floor(QUAD_CENTER_SIZE / 2) - 1;
+    const centerY = QUAD_CENTER_POSITION.y + Math.floor(QUAD_CENTER_SIZE / 2) - 1;
     
-    // Adjust position based on direction
-    switch (direction) {
-      case 'UP': 
-        return { x: baseX, y: baseY - 8 }; // Double the offset
-      case 'DOWN': 
-        return { x: baseX, y: baseY + 2 }; // Doubled
-      case 'LEFT': 
-        return { x: baseX - 8, y: baseY }; // Double the offset
-      case 'RIGHT': 
-        return { x: baseX + 2, y: baseY }; // Doubled
-      default:
-        return { x: baseX, y: baseY };
-    }
+    return { x: centerX, y: centerY };
   };
 
   const initializeGame = useCallback(() => {
@@ -133,28 +119,22 @@ export const useGameLogic = () => {
     const newLinesCleared = gameState.linesCleared + linesCleared;
     const newLevel = Math.floor(newLinesCleared / 10) + 1;
     
-    // Generate new tetromino with proper position based on mode
     const newTetrominoType = gameState.nextTetromino;
     const newDirection = getRandomDirection();
     
-    // Create new tetromino and use the preselected shape
     const newActiveTetromino = createTetromino(newTetrominoType);
     newActiveTetromino.shape = [...gameState.nextTetrominoShape];
     
-    // In quad mode, position the tetromino in the center and assign a random direction
     if (gameState.quadMode) {
       newActiveTetromino.position = getQuadModeInitialPosition(newDirection);
       newActiveTetromino.direction = newDirection;
     }
     
-    // Generate the next tetromino and its shape
     const nextType = randomTetromino();
     const nextShape = getRandomlyRotatedShape(nextType);
     
-    // Check if game over
     if (checkCollision(newActiveTetromino.position, newActiveTetromino.shape, newBoard)) {
       setGameState(prev => {
-        // Update quad scores if in quad mode
         let newQuadScores = {...prev.quadScores};
         let newQuadLinesCleared = {...prev.quadLinesCleared};
         
@@ -186,7 +166,6 @@ export const useGameLogic = () => {
     }
     
     setGameState(prev => {
-      // Update quad scores if in quad mode
       let newQuadScores = {...prev.quadScores};
       let newQuadLinesCleared = {...prev.quadLinesCleared};
       
@@ -220,21 +199,29 @@ export const useGameLogic = () => {
   const moveTetrominoAction = useCallback((direction: 'LEFT' | 'RIGHT' | 'DOWN') => {
     if (!gameState.activeTetromino || gameState.isPaused || gameState.gameOver) return false;
 
-    // In quad mode, only move in the assigned direction
     if (gameState.quadMode && gameState.activeTetromino.direction) {
       const quadDirection = gameState.activeTetromino.direction;
       
-      // Only allow movement in the tetromino's assigned direction
-      if ((quadDirection === 'LEFT' && direction !== 'LEFT') ||
-          (quadDirection === 'RIGHT' && direction !== 'RIGHT') ||
-          (quadDirection === 'DOWN' && direction !== 'DOWN') ||
-          (quadDirection === 'UP' && direction !== 'DOWN')) { // For UP direction, DOWN still applies for dropping faster
+      if (quadDirection === 'UP' && direction === 'DOWN') {
+        const { newTetromino, collided } = moveTetromino(gameState, 'UP');
+        
+        if (collided) {
+          updateBoard();
+          return false;
+        } else if (newTetromino) {
+          setGameState(prev => ({
+            ...prev,
+            activeTetromino: newTetromino
+          }));
+          return true;
+        }
         return false;
       }
-
-      // Special case for UP direction: we use DOWN to drop faster, but need to invert the movement
-      if (quadDirection === 'UP' && direction === 'DOWN') {
-        direction = 'UP' as any; // This will be handled specially in moveTetromino
+      
+      if ((quadDirection === 'LEFT' && direction !== 'LEFT') ||
+          (quadDirection === 'RIGHT' && direction !== 'RIGHT') ||
+          (quadDirection === 'DOWN' && direction !== 'DOWN')) {
+        return false;
       }
     }
 
@@ -281,8 +268,6 @@ export const useGameLogic = () => {
       const newQuadMode = !prev.quadMode;
       const newDirection = getRandomDirection();
       
-      // If we have an active tetromino and we're switching to quad mode,
-      // we need to reposition it to the center with a random direction
       let updatedActiveTetromino = prev.activeTetromino;
       
       if (updatedActiveTetromino && newQuadMode) {
@@ -292,7 +277,6 @@ export const useGameLogic = () => {
           direction: newDirection
         };
       } else if (updatedActiveTetromino && !newQuadMode) {
-        // Switching back to normal mode, reset to normal position
         updatedActiveTetromino = {
           ...updatedActiveTetromino,
           position: getInitialPosition(),
@@ -305,7 +289,6 @@ export const useGameLogic = () => {
         quadMode: newQuadMode,
         quadDirection: newDirection,
         activeTetromino: updatedActiveTetromino,
-        // Reset quad scores when toggling mode
         quadScores: createEmptyQuadScores(),
         quadLinesCleared: createEmptyQuadScores()
       };
@@ -360,9 +343,15 @@ export const useGameLogic = () => {
     if (gameState.isPaused || gameState.gameOver) return;
     
     if (!gameState.activeTetromino && !gameState.isPaused && !gameState.gameOver) {
+      const newDirection = getRandomDirection();
       const activeTetromino = createTetromino(gameState.nextTetromino);
-      // Use the preselected shape for the next tetromino
+      
       activeTetromino.shape = [...gameState.nextTetrominoShape];
+      
+      if (gameState.quadMode) {
+        activeTetromino.direction = newDirection;
+        activeTetromino.position = getQuadModeInitialPosition(newDirection);
+      }
       
       const nextType = randomTetromino();
       const nextShape = getRandomlyRotatedShape(nextType);
@@ -371,7 +360,8 @@ export const useGameLogic = () => {
         ...prev,
         activeTetromino,
         nextTetromino: nextType,
-        nextTetrominoShape: nextShape
+        nextTetrominoShape: nextShape,
+        quadDirection: newDirection
       }));
       return;
     }
@@ -380,9 +370,22 @@ export const useGameLogic = () => {
       console.log("Drop interval executed", gameState.activeTetromino?.position);
       
       if (gameState.activeTetromino) {
-        const moveResult = moveTetrominoAction('DOWN');
-        if (!moveResult) {
-          console.log("Piece locked, generating new piece");
+        if (gameState.quadMode && gameState.activeTetromino.direction === 'UP') {
+          const { newTetromino, collided } = moveTetromino(gameState, 'UP');
+          
+          if (collided) {
+            updateBoard();
+          } else if (newTetromino) {
+            setGameState(prev => ({
+              ...prev,
+              activeTetromino: newTetromino
+            }));
+          }
+        } else {
+          const moveResult = moveTetrominoAction('DOWN');
+          if (!moveResult) {
+            console.log("Piece locked, generating new piece");
+          }
         }
       }
     }, calculateDropInterval(gameState.level));
@@ -397,7 +400,9 @@ export const useGameLogic = () => {
     moveTetrominoAction,
     gameState.level,
     gameState.nextTetromino,
-    gameState.nextTetrominoShape
+    gameState.nextTetrominoShape,
+    gameState.quadMode,
+    updateBoard
   ]);
 
   useEffect(() => {

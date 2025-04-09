@@ -17,7 +17,7 @@ const QuadModeToggle: React.FC<QuadModeToggleProps> = ({ enabled, onToggle }) =>
         onCheckedChange={onToggle} 
       />
       <Label htmlFor="quad-mode" className="text-white cursor-pointer">
-        Quad Mode (4 Separate Stacks)
+        Quad Mode (4-Way Tetris)
       </Label>
     </div>
   );
