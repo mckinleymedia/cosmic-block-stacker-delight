@@ -101,18 +101,23 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Updated cell size - doubled from previous size
+  // Updated cell size
   const cellSize = "w-[10px] h-[10px] sm:w-[12px] sm:h-[12px]";
   
   // Helper function to determine if a cell should be rendered as part of the plus shape
   const isInPlusShape = (row: number, col: number): boolean => {
     // Center vertical strip (width 10)
-    if (col >= 17 && col < 27) {
+    if (col >= 17 && col < 27 && (row < 17 || row >= 27)) {
       return true;
     }
     
     // Center horizontal strip (height 10)
-    if (row >= 17 && row < 27) {
+    if (row >= 17 && row < 27 && (col < 17 || col >= 27)) {
+      return true;
+    }
+    
+    // Center intersection
+    if (row >= 17 && row < 27 && col >= 17 && col < 27) {
       return true;
     }
     
@@ -166,18 +171,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 }
               } else if (rowIndex >= 17 && rowIndex < 27) {
                 // Horizontal section
-                const boardX = rowIndex - 17;
+                const boardY = rowIndex - 17;
                 if (cellIndex < 17) {
                   // Left section
-                  const actualY = BOARD_HEIGHT - 17 + cellIndex;
-                  if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[actualY][boardX];
+                  const boardX = BOARD_WIDTH - 17 + cellIndex;
+                  if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[boardY][boardX];
                   }
                 } else if (cellIndex >= 27) {
                   // Right section
-                  const actualY = cellIndex - 27;
-                  if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[actualY][boardX];
+                  const boardX = cellIndex - 27;
+                  if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[boardY][boardX];
                   }
                 }
               }
