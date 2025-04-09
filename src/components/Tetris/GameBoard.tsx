@@ -53,107 +53,157 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   }
 
-  // Function to render a tetris board with specific orientation
-  const renderTetrisBoard = (board: Cell[][], rotation: 0 | 90 | 180 | 270) => {
-    // Create copies for different orientations
-    const orientedBoard = [...board];
-    
+  // Calculate the middle points of the board
+  const midY = Math.floor(renderBoard.length / 2);
+  const midX = Math.floor(renderBoard[0].length / 2);
+  
+  // Function to render a single cell with the correct styling
+  const renderCell = (cell: Cell, rowIndex: number, cellIndex: number) => {
     return (
-      <div className={`grid grid-cols-10 ${rotation === 90 ? 'rotate-90' : rotation === 180 ? 'rotate-180' : rotation === 270 ? '-rotate-90' : ''}`}>
-        {orientedBoard.map((row, rowIndex) =>
-          row.map((cell, cellIndex) => (
-            <div 
-              key={`${rotation}-${rowIndex}-${cellIndex}`}
-              className={cn(
-                "w-3 h-3 sm:w-4 sm:h-4 border border-tetris-grid",
-                cell.filled ? cell.color : "bg-tetris-bg"
-              )}
-            />
-          ))
+      <div 
+        key={`cell-${rowIndex}-${cellIndex}`}
+        className={cn(
+          "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
+          cell.filled ? cell.color : "bg-tetris-bg"
         )}
-      </div>
+      />
     );
   };
 
+  // Standard single board rendering
+  if (!quadMode) {
+    return (
+      <div className={cn(
+        "relative border-2 border-tetris-border rounded overflow-hidden",
+        (gameOver || isPaused) && "opacity-60"
+      )}>
+        <div className="grid grid-cols-10">
+          {renderBoard.map((row, rowIndex) =>
+            row.map((cell, cellIndex) => renderCell(cell, rowIndex, cellIndex))
+          )}
+        </div>
+        
+        {gameOver && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
+            <p className="text-3xl font-bold text-red-500 mb-2">GAME OVER</p>
+          </div>
+        )}
+        
+        {isPaused && !gameOver && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
+            <p className="text-xl font-bold text-white mb-2">GAME PAUSED</p>
+            
+            {onQuit && (
+              <Button 
+                variant="outline" 
+                onClick={onQuit}
+                className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0"
+              >
+                <span>Quit</span>
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Quad mode rendering with intersecting centers
   return (
     <div className={cn(
       "relative border-2 border-tetris-border rounded overflow-hidden",
       (gameOver || isPaused) && "opacity-60"
     )}>
-      {quadMode ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 p-2 bg-tetris-bg">
-          {/* Empty cell in top-left */}
-          <div className="hidden md:block"></div>
-          
-          {/* Top Tetris (180° rotation) */}
-          <div className="flex justify-center items-center">
-            {renderTetrisBoard(renderBoard, 180)}
-          </div>
-          
-          {/* Empty cell in top-right */}
-          <div className="hidden md:block"></div>
-          
-          {/* Left Tetris (90° rotation) */}
-          <div className="hidden md:flex justify-center items-center">
-            {renderTetrisBoard(renderBoard, 90)}
-          </div>
-          
-          {/* Center/Main Tetris */}
-          <div className="flex justify-center items-center">
-            {renderTetrisBoard(renderBoard, 0)}
-          </div>
-          
-          {/* Right Tetris (270° rotation) */}
-          <div className="hidden md:flex justify-center items-center">
-            {renderTetrisBoard(renderBoard, 270)}
-          </div>
-          
-          {/* Mobile version - simplified with just two boards */}
-          <div className="flex md:hidden justify-center items-center">
-            {renderTetrisBoard(renderBoard, 90)}
-          </div>
-          
-          <div className="flex md:hidden justify-center items-center">
-            {renderTetrisBoard(renderBoard, 270)}
+      <div className="relative w-full h-full bg-tetris-bg">
+        {/* Center board area */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-tetris-bg">
+          <div className="grid grid-cols-4 gap-0">
+            {Array.from({ length: 4 }).map((_, rowIndex) =>
+              Array.from({ length: 4 }).map((_, cellIndex) => {
+                // Get cell from the main board's center
+                const boardY = midY - 2 + rowIndex;
+                const boardX = midX - 2 + cellIndex;
+                const cell = (boardY >= 0 && boardY < renderBoard.length && 
+                              boardX >= 0 && boardX < renderBoard[0].length) 
+                            ? renderBoard[boardY][boardX] 
+                            : { filled: false, color: '' };
+                
+                return (
+                  <div 
+                    key={`center-${rowIndex}-${cellIndex}`}
+                    className={cn(
+                      "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
+                      cell.filled ? cell.color : "bg-tetris-bg"
+                    )}
+                  />
+                );
+              })
+            )}
           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-10">
-          {renderBoard.map((row, rowIndex) =>
-            row.map((cell, cellIndex) => (
-              <div 
-                key={`${rowIndex}-${cellIndex}`}
-                className={cn(
-                  "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
-                  cell.filled ? cell.color : "bg-tetris-bg"
-                )}
-              />
-            ))
-          )}
+
+        {/* Down direction (normal) */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-[240px] sm:w-[320px]">
+          <div className="grid grid-cols-10">
+            {renderBoard.slice(midY + 2).map((row, rowIndex) =>
+              row.map((cell, cellIndex) => renderCell(cell, rowIndex + midY + 2, cellIndex))
+            )}
+          </div>
         </div>
-      )}
-      
-      {gameOver && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
-          <p className="text-3xl font-bold text-red-500 mb-2">GAME OVER</p>
+
+        {/* Up direction (180° rotation) */}
+        <div className="absolute bottom-1/2 left-1/2 transform -translate-x-1/2 rotate-180 w-[240px] sm:w-[320px]">
+          <div className="grid grid-cols-10">
+            {renderBoard.slice(0, midY - 2).reverse().map((row, rowIndex) =>
+              row.map((cell, cellIndex) => renderCell(cell, midY - 3 - rowIndex, cellIndex))
+            )}
+          </div>
         </div>
-      )}
-      
-      {isPaused && !gameOver && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
-          <p className="text-xl font-bold text-white mb-2">GAME PAUSED</p>
-          
-          {onQuit && (
-            <Button 
-              variant="outline" 
-              onClick={onQuit}
-              className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0"
-            >
-              <span>Quit</span>
-            </Button>
-          )}
+
+        {/* Left direction (90° rotation) */}
+        <div className="absolute top-1/2 right-1/2 transform translate-y-[-50%] rotate-90 origin-right w-[240px] sm:w-[320px]">
+          <div className="grid grid-cols-10">
+            {renderBoard.map((row, rowIndex) =>
+              row.slice(0, midX - 2).reverse().map((cell, cellIndex) => 
+                renderCell(cell, rowIndex, midX - 3 - cellIndex)
+              )
+            )}
+          </div>
         </div>
-      )}
+
+        {/* Right direction (270° rotation) */}
+        <div className="absolute top-1/2 left-1/2 transform translate-y-[-50%] -rotate-90 origin-left w-[240px] sm:w-[320px]">
+          <div className="grid grid-cols-10">
+            {renderBoard.map((row, rowIndex) =>
+              row.slice(midX + 2).map((cell, cellIndex) => 
+                renderCell(cell, rowIndex, cellIndex + midX + 2)
+              )
+            )}
+          </div>
+        </div>
+        
+        {gameOver && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-20">
+            <p className="text-3xl font-bold text-red-500 mb-2">GAME OVER</p>
+          </div>
+        )}
+        
+        {isPaused && !gameOver && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-20">
+            <p className="text-xl font-bold text-white mb-2">GAME PAUSED</p>
+            
+            {onQuit && (
+              <Button 
+                variant="outline" 
+                onClick={onQuit}
+                className="mt-2 bg-red-600 hover:bg-red-500 text-white border-0"
+              >
+                <span>Quit</span>
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
