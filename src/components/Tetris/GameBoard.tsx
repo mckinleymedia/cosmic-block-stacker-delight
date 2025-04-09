@@ -102,15 +102,55 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   const cellSize = "w-[10px] h-[10px] sm:w-[12px] sm:h-[12px]";
   
-  const isInPlusShape = (row: number, col: number): boolean => {
-    if (col >= 17 && col < 27) {
-      if (row < 17) return true;
-      if (row >= 27) return true;
+  const isInCustomShape = (row: number, col: number): boolean => {
+    const centerColStart = 17;
+    const centerColEnd = 27;
+    
+    const centerRowStart = 17;
+    const centerRowEnd = 27;
+    
+    if (col >= centerColStart && col < centerColEnd) {
+      if (row < centerRowStart) {
+        return row >= centerRowStart - 17;
+      }
+      if (row >= centerRowEnd) {
+        return row < centerRowEnd + 17;
+      }
     }
     
-    if (row >= 17 && row < 27) {
-      if (col < 17) return true;
-      if (col >= 27) return true;
+    if (row >= centerRowStart && row < centerRowEnd && col < centerColStart) {
+      return col >= centerColStart - 17;
+    }
+    
+    if (row >= centerRowStart && row < centerRowEnd && col >= centerColEnd) {
+      return col < centerColEnd + 17;
+    }
+    
+    if (row < centerRowStart && col < centerColStart) {
+      const verticalDistance = centerRowStart - row;
+      const horizontalDistance = centerColStart - col;
+      return verticalDistance <= 17 && horizontalDistance <= 10;
+    }
+    
+    if (row < centerRowStart && col >= centerColEnd) {
+      const verticalDistance = centerRowStart - row;
+      const horizontalDistance = col - centerColEnd + 1;
+      return verticalDistance <= 10 && horizontalDistance <= 17;
+    }
+    
+    if (row >= centerRowEnd && col < centerColStart) {
+      const verticalDistance = row - centerRowEnd + 1;
+      const horizontalDistance = centerColStart - col;
+      return verticalDistance <= 10 && horizontalDistance <= 17;
+    }
+    
+    if (row >= centerRowEnd && col >= centerColEnd) {
+      const verticalDistance = row - centerRowEnd + 1;
+      const horizontalDistance = col - centerColEnd + 1;
+      return verticalDistance <= 17 && horizontalDistance <= 10;
+    }
+    
+    if (row >= centerRowStart && row < centerRowEnd && col >= centerColStart && col < centerColEnd) {
       return true;
     }
     
@@ -128,9 +168,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
              style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
           {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
             Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
-              const isPartOfPlus = isInPlusShape(rowIndex, cellIndex);
+              const isPartOfShape = isInCustomShape(rowIndex, cellIndex);
               
-              if (!isPartOfPlus) {
+              if (!isPartOfShape) {
                 return <div key={`cross-${rowIndex}-${cellIndex}`} className="hidden"></div>;
               }
               

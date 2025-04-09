@@ -5,7 +5,7 @@ export const BOARD_HEIGHT = 20;
 
 // Cross-shaped board dimensions
 export const CROSS_BOARD_WIDTH = 10;  // Width of each arm
-export const CROSS_BOARD_HEIGHT = 44; // Height/length of each arm
+export const CROSS_BOARD_HEIGHT = 44; // Total height/width of the board area
 export const CROSS_CENTER_SIZE = 10;  // Size of center intersection
 
 // Center position calculation for cross board
