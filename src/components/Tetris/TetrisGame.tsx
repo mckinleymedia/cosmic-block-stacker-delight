@@ -37,6 +37,10 @@ const TetrisGame: React.FC = () => {
   // Calculate total quad score
   const totalQuadScore = gameState.quadScores.up + gameState.quadScores.down + 
                          gameState.quadScores.left + gameState.quadScores.right;
+                         
+  // Calculate total quad lines cleared
+  const totalQuadLinesCleared = gameState.quadLinesCleared.up + gameState.quadLinesCleared.down + 
+                               gameState.quadLinesCleared.left + gameState.quadLinesCleared.right;
   
   const handleQuit = useCallback(() => {
     handleGameAction('QUIT');
@@ -100,6 +104,8 @@ const TetrisGame: React.FC = () => {
           <QuadModeStats 
             scores={gameState.quadScores}
             linesCleared={gameState.quadLinesCleared}
+            level={gameState.level}
+            totalLinesCleared={totalQuadLinesCleared}
           />
         ) : (
           <GameStats 

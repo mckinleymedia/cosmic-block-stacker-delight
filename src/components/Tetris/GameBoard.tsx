@@ -100,8 +100,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Render quad mode board (132x132 plus sign shape)
-  const cellSize = "w-[3px] h-[3px] sm:w-[4px] sm:h-[4px]"; // Smaller cells for the larger 132x132 grid
+  // Render quad mode board (132x132 plus sign shape) with larger cells
+  const cellSize = "w-[4px] h-[4px] sm:w-[5px] sm:h-[5px]"; // Increased from 3px/4px to 4px/5px
   const centerSize = 8; // 8x8 center
   
   return (

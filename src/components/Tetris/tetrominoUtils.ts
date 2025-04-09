@@ -96,7 +96,8 @@ export const moveTetromino = (
       },
       collided: false
     };
-  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && direction === 'UP')) {
+  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && (direction === 'UP' || direction === 'DOWN'))) {
+    // Fix: Changed the comparison to allow both UP and DOWN directions to trigger collision in UP mode
     return { newTetromino: gameState.activeTetromino, collided: true };
   }
   
