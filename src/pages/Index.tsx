@@ -6,7 +6,7 @@ import LeaderboardModal from "@/components/Tetris/LeaderboardModal";
 const Index = () => {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   return <div className="min-h-screen flex flex-col items-center justify-center bg-tetris-bg p-4">
-      <div className="flex items-center mb-6 w-full max-w-5xl justify-center relative">
+      <div className="flex items-center mb-6 w-full max-w-5xl justify-center relative pl-38">
         <h1 className="text-5xl font-bold text-white font-mono tracking-wider">
           <span className="text-tetris-i">T</span>
           <span className="text-tetris-j">E</span>
