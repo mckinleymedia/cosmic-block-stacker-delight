@@ -1,10 +1,14 @@
-
 import React from 'react';
 import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
 import { TETROMINOS } from './tetrominos';
 import { Button } from '@/components/ui/button';
-import { CROSS_BOARD_WIDTH, CROSS_BOARD_HEIGHT } from './gameConstants';
+import { 
+  CROSS_BOARD_WIDTH, 
+  CROSS_BOARD_HEIGHT, 
+  BOARD_HEIGHT, 
+  BOARD_WIDTH 
+} from './gameConstants';
 
 interface GameBoardProps {
   board: Cell[][];
@@ -23,10 +27,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
   quadMode = false,
   onQuit
 }) => {
-  // Create a copy of the board to render the active tetromino
   const renderBoard = JSON.parse(JSON.stringify(board));
   
-  // Add the active tetromino to the board for rendering
   if (activeTetromino) {
     const { position, shape, type } = activeTetromino;
     const color = TETROMINOS[type].color;
@@ -37,7 +39,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
           const boardY = position.y + y;
           const boardX = position.x + x;
           
-          // Only render cells that are within the visible board area
           if (
             boardY >= 0 && 
             boardY < renderBoard.length && 
@@ -54,7 +55,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   }
 
-  // Render standard board
   if (!quadMode) {
     return (
       <div className={cn(
@@ -100,8 +100,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Render cross board mode (two 10x44 rectangles that intersect in the center)
-  const cellSize = "w-[5px] h-[5px] sm:w-[6px] sm:h-[6px]"; // Slightly larger cells
+  const cellSize = "w-[5px] h-[5px] sm:w-[6px] sm:h-[6px]";
   const totalWidth = CROSS_BOARD_HEIGHT;
   const centerOffsetX = Math.floor((CROSS_BOARD_HEIGHT - CROSS_BOARD_WIDTH) / 2);
   const centerOffsetY = Math.floor((CROSS_BOARD_HEIGHT - CROSS_BOARD_WIDTH) / 2);
@@ -116,7 +115,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
         <div className="grid" style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
           {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
             Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
-              // Determine if this cell is part of the cross shape
               const isVertical = cellIndex >= centerOffsetX && 
                                cellIndex < centerOffsetX + CROSS_BOARD_WIDTH;
               const isHorizontal = rowIndex >= centerOffsetY && 
@@ -124,7 +122,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
               const isPartOfCross = isVertical || isHorizontal;
               
               if (!isPartOfCross) {
-                // Cells not part of the cross are rendered as empty background
                 return (
                   <div 
                     key={`cross-${rowIndex}-${cellIndex}`}
@@ -133,22 +130,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 );
               }
               
-              // Map the cross board grid to the appropriate segments of our 10x20 board
               let cellContent = { filled: false, color: '' };
               
               if (isVertical && !isHorizontal) {
-                // Vertical part of the cross (excluding intersection)
                 const boardX = cellIndex - centerOffsetX;
                 const boardY = rowIndex;
                 
-                // Bottom vertical section (normal orientation)
                 if (rowIndex >= centerOffsetY + CROSS_BOARD_WIDTH) {
                   const actualY = rowIndex - (centerOffsetY + CROSS_BOARD_WIDTH);
                   if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
                     cellContent = renderBoard[actualY][boardX];
                   }
                 } 
-                // Top vertical section (flipped)
                 else if (rowIndex < centerOffsetY) {
                   const actualY = BOARD_HEIGHT - 1 - (centerOffsetY - rowIndex - 1);
                   if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
@@ -156,17 +149,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   }
                 }
               } else if (isHorizontal && !isVertical) {
-                // Horizontal part of the cross (excluding intersection)
                 const boardX = rowIndex - centerOffsetY;
                 
-                // Right horizontal section
                 if (cellIndex >= centerOffsetX + CROSS_BOARD_WIDTH) {
                   const actualY = cellIndex - (centerOffsetX + CROSS_BOARD_WIDTH);
                   if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
                     cellContent = renderBoard[actualY][boardX];
                   }
                 } 
-                // Left horizontal section (flipped)
                 else if (cellIndex < centerOffsetX) {
                   const actualY = BOARD_HEIGHT - 1 - (centerOffsetX - cellIndex - 1);
                   if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
@@ -174,11 +164,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   }
                 }
               } else if (isVertical && isHorizontal) {
-                // Intersection area - center of the cross
                 const boardX = cellIndex - centerOffsetX;
                 const boardY = rowIndex - centerOffsetY;
                 if (boardY >= 0 && boardY < CROSS_BOARD_WIDTH && boardX >= 0 && boardX < CROSS_BOARD_WIDTH) {
-                  // Center area is just rendered as special highlight
                   return (
                     <div 
                       key={`cross-${rowIndex}-${cellIndex}`}
@@ -187,7 +175,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         "border border-tetris-grid/50",
                         renderBoard[boardY][boardX].filled 
                           ? renderBoard[boardY][boardX].color 
-                          : "bg-tetris-border/30" // Highlighted center area
+                          : "bg-tetris-border/30"
                       )}
                     />
                   );
@@ -208,7 +196,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
           )}
         </div>
 
-        {/* Game Over and Pause overlays */}
         {gameOver && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-50">
             <p className="text-3xl font-bold text-red-500 mb-2">GAME OVER</p>
