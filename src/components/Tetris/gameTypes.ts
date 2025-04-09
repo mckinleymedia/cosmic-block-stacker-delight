@@ -27,6 +27,7 @@ export type GameState = {
   linesCleared: number;
   gameOver: boolean;
   isPaused: boolean;
+  quadMode: boolean; // Add quad mode flag
 };
 
 export type GameAction = 
@@ -36,7 +37,8 @@ export type GameAction =
   | 'ROTATE' 
   | 'PAUSE' 
   | 'RESTART'
-  | 'QUIT';
+  | 'QUIT'
+  | 'TOGGLE_QUAD_MODE'; // Add new action
 
 export type LeaderboardEntry = {
   id: string;

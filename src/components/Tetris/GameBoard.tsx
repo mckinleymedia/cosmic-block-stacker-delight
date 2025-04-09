@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Cell, ActiveTetromino } from './gameTypes';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ interface GameBoardProps {
   activeTetromino: ActiveTetromino | null;
   gameOver: boolean;
   isPaused: boolean;
+  quadMode?: boolean;
   onQuit?: () => void;
 }
 
@@ -17,6 +19,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   activeTetromino, 
   gameOver,
   isPaused,
+  quadMode = false,
   onQuit
 }) => {
   // Create a copy of the board to render the active tetromino
@@ -55,19 +58,106 @@ const GameBoard: React.FC<GameBoardProps> = ({
       "relative border-2 border-tetris-border rounded overflow-hidden",
       (gameOver || isPaused) && "opacity-60"
     )}>
-      <div className="grid grid-cols-10">
-        {renderBoard.map((row, rowIndex) =>
-          row.map((cell, cellIndex) => (
-            <div 
-              key={`${rowIndex}-${cellIndex}`}
-              className={cn(
-                "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
-                cell.filled ? cell.color : "bg-tetris-bg"
+      {quadMode ? (
+        <div className="grid grid-cols-30 gap-1">
+          {/* Simplified quad mode visualization - would need proper implementation */}
+          <div className="col-span-10 col-start-11">
+            <div className="grid grid-cols-10">
+              {renderBoard.slice(0, 10).map((row, rowIndex) =>
+                row.map((cell, cellIndex) => (
+                  <div 
+                    key={`top-${rowIndex}-${cellIndex}`}
+                    className={cn(
+                      "w-4 h-4 border border-tetris-grid",
+                      cell.filled ? cell.color : "bg-tetris-bg"
+                    )}
+                  />
+                ))
               )}
-            />
-          ))
-        )}
-      </div>
+            </div>
+          </div>
+          
+          <div className="col-span-30 grid grid-cols-30 gap-1">
+            <div className="col-span-10">
+              <div className="grid grid-cols-10">
+                {renderBoard.slice(10, 20).map((row, rowIndex) =>
+                  row.map((cell, cellIndex) => (
+                    <div 
+                      key={`left-${rowIndex}-${cellIndex}`}
+                      className={cn(
+                        "w-4 h-4 border border-tetris-grid",
+                        cell.filled ? cell.color : "bg-tetris-bg"
+                      )}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+            
+            <div className="col-span-10">
+              <div className="grid grid-cols-10">
+                {renderBoard.map((row, rowIndex) =>
+                  row.map((cell, cellIndex) => (
+                    <div 
+                      key={`main-${rowIndex}-${cellIndex}`}
+                      className={cn(
+                        "w-4 h-4 sm:w-6 sm:h-6 border border-tetris-grid",
+                        cell.filled ? cell.color : "bg-tetris-bg"
+                      )}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+            
+            <div className="col-span-10">
+              <div className="grid grid-cols-10">
+                {renderBoard.slice(10, 20).map((row, rowIndex) =>
+                  row.map((cell, cellIndex) => (
+                    <div 
+                      key={`right-${rowIndex}-${cellIndex}`}
+                      className={cn(
+                        "w-4 h-4 border border-tetris-grid",
+                        cell.filled ? cell.color : "bg-tetris-bg"
+                      )}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="col-span-10 col-start-11">
+            <div className="grid grid-cols-10">
+              {renderBoard.slice(0, 10).map((row, rowIndex) =>
+                row.map((cell, cellIndex) => (
+                  <div 
+                    key={`bottom-${rowIndex}-${cellIndex}`}
+                    className={cn(
+                      "w-4 h-4 border border-tetris-grid",
+                      cell.filled ? cell.color : "bg-tetris-bg"
+                    )}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-10">
+          {renderBoard.map((row, rowIndex) =>
+            row.map((cell, cellIndex) => (
+              <div 
+                key={`${rowIndex}-${cellIndex}`}
+                className={cn(
+                  "w-6 h-6 sm:w-8 sm:h-8 border border-tetris-grid",
+                  cell.filled ? cell.color : "bg-tetris-bg"
+                )}
+              />
+            ))
+          )}
+        </div>
+      )}
       
       {gameOver && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">

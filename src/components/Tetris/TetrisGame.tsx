@@ -6,6 +6,7 @@ import GameBoard from './GameBoard';
 import NextPiece from './NextPiece';
 import GameStats from './GameStats';
 import GameControls from './GameControls';
+import QuadModeToggle from './QuadModeToggle';
 import ScoreSubmissionDialog from './ScoreSubmissionDialog';
 import LeaderboardModal from './LeaderboardModal';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -36,6 +37,10 @@ const TetrisGame: React.FC = () => {
     handleGameAction('QUIT');
   }, [handleGameAction]);
   
+  const handleToggleQuadMode = useCallback(() => {
+    handleGameAction('TOGGLE_QUAD_MODE');
+  }, [handleGameAction]);
+  
   // Check for high score when game ends
   React.useEffect(() => {
     if (gameState.gameOver && gameState.score > 0 && !scoreSubmitted) {
@@ -62,13 +67,23 @@ const TetrisGame: React.FC = () => {
   
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
-      <GameBoard 
-        board={gameState.board} 
-        activeTetromino={gameHasStarted ? gameState.activeTetromino : null}
-        gameOver={showGameOver} 
-        isPaused={gameState.isPaused && gameHasStarted && !gameState.gameOver}
-        onQuit={handleQuit}
-      />
+      <div className="flex flex-col items-center">
+        <GameBoard 
+          board={gameState.board} 
+          activeTetromino={gameHasStarted ? gameState.activeTetromino : null}
+          gameOver={showGameOver} 
+          isPaused={gameState.isPaused && gameHasStarted && !gameState.gameOver}
+          onQuit={handleQuit}
+          quadMode={gameState.quadMode}
+        />
+        <div className="mt-2 w-full max-w-[320px]">
+          <QuadModeToggle 
+            enabled={gameState.quadMode}
+            onToggle={handleToggleQuadMode}
+            disabled={!gameState.isPaused && !gameState.gameOver && gameHasStarted}
+          />
+        </div>
+      </div>
       
       <div className="flex flex-col gap-4 w-full max-w-[200px] mx-auto">
         <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
