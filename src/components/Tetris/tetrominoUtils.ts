@@ -1,3 +1,4 @@
+
 import { ActiveTetromino, Position, GameState, Direction } from './gameTypes';
 import { BOARD_WIDTH } from './gameConstants';
 import { checkCollision } from './boardUtils';
@@ -95,8 +96,8 @@ export const moveTetromino = (
       },
       collided: false
     };
-  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && (direction === 'UP' || direction === 'DOWN'))) {
-    // Fix: Changed the comparison to allow both UP and DOWN directions to trigger collision in UP mode
+  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && direction === 'UP')) {
+    // Fixed: We now compare only to 'UP' for the UP direction case
     return { newTetromino: gameState.activeTetromino, collided: true };
   }
   
