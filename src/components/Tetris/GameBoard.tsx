@@ -104,6 +104,21 @@ const GameBoard: React.FC<GameBoardProps> = ({
   // Updated cell size - doubled from previous size
   const cellSize = "w-[10px] h-[10px] sm:w-[12px] sm:h-[12px]";
   
+  // Helper function to determine if a cell should be rendered as part of the plus shape
+  const isInPlusShape = (row: number, col: number): boolean => {
+    // Center vertical strip (width 10)
+    if (col >= 17 && col < 27) {
+      return true;
+    }
+    
+    // Center horizontal strip (height 10)
+    if (row >= 17 && row < 27) {
+      return true;
+    }
+    
+    return false;
+  };
+  
   return (
     <div className={cn(
       "relative overflow-hidden mx-auto",
@@ -115,64 +130,54 @@ const GameBoard: React.FC<GameBoardProps> = ({
              style={{ gridTemplateColumns: `repeat(${CROSS_BOARD_HEIGHT}, minmax(0, 1fr))` }}>
           {Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, rowIndex) =>
             Array.from({ length: CROSS_BOARD_HEIGHT }).map((_, cellIndex) => {
-              // Check if we're in a corner region that should be removed
-              const isTopLeftCorner = rowIndex < 17 && cellIndex < 17;
-              const isTopRightCorner = rowIndex < 17 && cellIndex >= 27;
-              const isBottomLeftCorner = rowIndex >= 27 && cellIndex < 17;
-              const isBottomRightCorner = rowIndex >= 27 && cellIndex >= 27;
+              // Determine if this cell is part of the plus shape
+              const isPartOfPlus = isInPlusShape(rowIndex, cellIndex);
               
-              // Skip rendering cells in the corners
-              if (isTopLeftCorner || isTopRightCorner || isBottomLeftCorner || isBottomRightCorner) {
+              // Skip rendering cells not in the plus shape
+              if (!isPartOfPlus) {
                 return <div key={`cross-${rowIndex}-${cellIndex}`} className="hidden"></div>;
               }
               
-              // For the plus shape - only render vertical and horizontal arms
-              const isVertical = cellIndex >= 17 && cellIndex < 27;
-              const isHorizontal = rowIndex >= 17 && rowIndex < 27;
-              const isPartOfCross = isVertical || isHorizontal;
-              
               let cellContent = { filled: false, color: '' };
               
-              if (isPartOfCross) {
-                if (isVertical && isHorizontal) {
-                  // Center intersection
-                  const boardX = cellIndex - 17;
-                  const boardY = rowIndex - 17;
-                  if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-                    cellContent = renderBoard[boardY][boardX];
+              // For the central cross intersection
+              if (rowIndex >= 17 && rowIndex < 27 && cellIndex >= 17 && cellIndex < 27) {
+                const boardX = cellIndex - 17;
+                const boardY = rowIndex - 17;
+                if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+                  cellContent = renderBoard[boardY][boardX];
+                }
+              } else if (cellIndex >= 17 && cellIndex < 27) {
+                // Vertical section
+                const boardX = cellIndex - 17;
+                const boardY = rowIndex;
+                if (rowIndex < 17) {
+                  // Top section
+                  const actualY = BOARD_HEIGHT - 17 + rowIndex;
+                  if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
                   }
-                } else if (isVertical) {
-                  // Vertical section
-                  const boardX = cellIndex - 17;
-                  const boardY = rowIndex;
-                  if (rowIndex < 17) {
-                    // Top section
-                    const actualY = BOARD_HEIGHT - 17 + rowIndex;
-                    if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                      cellContent = renderBoard[actualY][boardX];
-                    }
-                  } else if (rowIndex >= 27) {
-                    // Bottom section
-                    const actualY = rowIndex - 27;
-                    if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                      cellContent = renderBoard[actualY][boardX];
-                    }
+                } else if (rowIndex >= 27) {
+                  // Bottom section
+                  const actualY = rowIndex - 27;
+                  if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
                   }
-                } else if (isHorizontal) {
-                  // Horizontal section
-                  const boardX = rowIndex - 17;
-                  if (cellIndex < 17) {
-                    // Left section
-                    const actualY = BOARD_HEIGHT - 17 + cellIndex;
-                    if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                      cellContent = renderBoard[actualY][boardX];
-                    }
-                  } else if (cellIndex >= 27) {
-                    // Right section
-                    const actualY = cellIndex - 27;
-                    if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
-                      cellContent = renderBoard[actualY][boardX];
-                    }
+                }
+              } else if (rowIndex >= 17 && rowIndex < 27) {
+                // Horizontal section
+                const boardX = rowIndex - 17;
+                if (cellIndex < 17) {
+                  // Left section
+                  const actualY = BOARD_HEIGHT - 17 + cellIndex;
+                  if (actualY >= 0 && actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
+                  }
+                } else if (cellIndex >= 27) {
+                  // Right section
+                  const actualY = cellIndex - 27;
+                  if (actualY < BOARD_HEIGHT && boardX < BOARD_WIDTH) {
+                    cellContent = renderBoard[actualY][boardX];
                   }
                 }
               }
@@ -183,9 +188,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   className={cn(
                     cellSize,
                     "border border-tetris-grid/50",
-                    isPartOfCross 
-                      ? (cellContent.filled ? cellContent.color : "bg-tetris-bg")
-                      : "bg-transparent"
+                    cellContent.filled ? cellContent.color : "bg-tetris-bg"
                   )}
                 />
               );
