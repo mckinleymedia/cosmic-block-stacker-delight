@@ -16,8 +16,8 @@ const QuadModeToggle: React.FC<QuadModeToggleProps> = ({ enabled, onToggle }) =>
         checked={enabled} 
         onCheckedChange={onToggle} 
       />
-      <Label htmlFor="quad-mode" className="text-white/70 cursor-pointer">
-        Quad Mode (44x44)
+      <Label htmlFor="quad-mode" className="text-white cursor-pointer">
+        Quad Mode (Plus Shape)
       </Label>
     </div>
   );

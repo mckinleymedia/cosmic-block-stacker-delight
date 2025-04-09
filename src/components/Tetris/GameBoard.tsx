@@ -100,61 +100,76 @@ const GameBoard: React.FC<GameBoardProps> = ({
   }
 
   // Render quad mode board (44x44 plus sign shape)
-  const cellSize = "w-2 h-2 sm:w-2 sm:h-2"; // Smaller cells for the 44x44 grid
+  const cellSize = "w-[6px] h-[6px] sm:w-[8px] sm:h-[8px]"; // Smaller cells for the 44x44 grid
 
   return (
     <div className={cn(
       "relative overflow-hidden mx-auto",
       (gameOver || isPaused) && "opacity-60"
     )}>
-      {/* This is the container for the 44x44 quad-board */}
-      <div className="relative w-fit mx-auto" style={{ height: '88vh', width: '88vw', maxWidth: '88vh', maxHeight: '88vw' }}>
-        {/* Create a board that's 44x44 segments in size */}
-        <div className="grid grid-cols-44 gap-0 border-2 border-tetris-border rounded">
+      <div className="relative w-fit mx-auto border-2 border-tetris-border rounded" 
+           style={{ maxWidth: '100%', maxHeight: '70vh' }}>
+        <div className="grid" style={{ gridTemplateColumns: 'repeat(44, minmax(0, 1fr))' }}>
           {Array.from({ length: 44 }).map((_, rowIndex) =>
             Array.from({ length: 44 }).map((_, cellIndex) => {
-              // Determine if this cell is filled based on our board data
-              // For simplicity, we're checking if the cell is within the bounds of our actual data
-              const isCenterArea = rowIndex >= 20 && rowIndex < 24 && cellIndex >= 20 && cellIndex < 24;
+              // Determine if this cell should be part of the plus shape
+              const isCenter = rowIndex >= 20 && rowIndex < 24 && cellIndex >= 20 && cellIndex < 24; // Center 4x4
+              const isVertical = cellIndex >= 20 && cellIndex < 24 && (rowIndex < 20 || rowIndex >= 24); // Vertical line of the plus
+              const isHorizontal = rowIndex >= 20 && rowIndex < 24 && (cellIndex < 20 || cellIndex >= 24); // Horizontal line of the plus
+              const isPartOfPlus = isCenter || isVertical || isHorizontal;
               
-              // Check if the cell is filled from the renderBoard
-              let cellContent = { filled: false, color: '' };
+              if (!isPartOfPlus) {
+                // Cells not part of the plus are rendered as empty background
+                return (
+                  <div 
+                    key={`quad-${rowIndex}-${cellIndex}`}
+                    className={`${cellSize} bg-transparent`}
+                  />
+                );
+              }
               
               // Map the 44x44 grid to the appropriate segments of our 10x20 board
               // Center area (4x4 in the middle)
-              if (isCenterArea) {
-                cellContent = {
-                  filled: false,
-                  color: 'bg-tetris-border/30' // Highlighted center area
-                };
+              if (isCenter) {
+                return (
+                  <div 
+                    key={`quad-${rowIndex}-${cellIndex}`}
+                    className={cn(
+                      cellSize,
+                      "border border-tetris-grid/50",
+                      "bg-tetris-border/30" // Highlighted center area
+                    )}
+                  />
+                );
               }
-              // Top segment (vertical board, flipped 180 degrees)
-              else if (cellIndex >= 17 && cellIndex < 27 && rowIndex < 20) {
-                const boardX = cellIndex - 17;
+              
+              // Map to regular board positions based on the plus segment
+              let cellContent = { filled: false, color: '' };
+              
+              if (isVertical && rowIndex < 20) {
+                // Top part of the plus (vertical board, flipped 180 degrees)
+                const boardX = cellIndex - 20;
                 const boardY = 19 - rowIndex; // Flipped
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }
-              }
-              // Bottom segment (vertical board, normal orientation)
-              else if (cellIndex >= 17 && cellIndex < 27 && rowIndex >= 24) {
-                const boardX = cellIndex - 17;
+              } else if (isVertical && rowIndex >= 24) {
+                // Bottom part of the plus (vertical board, normal orientation)
+                const boardX = cellIndex - 20;
                 const boardY = rowIndex - 24;
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }
-              }
-              // Left segment (horizontal board, rotated 90 degrees clockwise)
-              else if (rowIndex >= 17 && rowIndex < 27 && cellIndex < 20) {
-                const boardX = rowIndex - 17;
-                const boardY = 19 - (cellIndex); // Flipped
+              } else if (isHorizontal && cellIndex < 20) {
+                // Left part of the plus (horizontal board, rotated 90 degrees clockwise)
+                const boardX = rowIndex - 20;
+                const boardY = 19 - cellIndex; // Flipped
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
                 }
-              }
-              // Right segment (horizontal board, rotated 270 degrees clockwise)
-              else if (rowIndex >= 17 && rowIndex < 27 && cellIndex >= 24) {
-                const boardX = rowIndex - 17;
+              } else if (isHorizontal && cellIndex >= 24) {
+                // Right part of the plus (horizontal board, rotated 270 degrees clockwise)
+                const boardX = rowIndex - 20;
                 const boardY = cellIndex - 24;
                 if (boardY >= 0 && boardY < renderBoard.length && boardX >= 0 && boardX < renderBoard[0].length) {
                   cellContent = renderBoard[boardY][boardX];
@@ -167,8 +182,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                   className={cn(
                     cellSize,
                     "border border-tetris-grid/50",
-                    cellContent.filled ? cellContent.color : "bg-tetris-bg",
-                    isCenterArea ? "bg-tetris-border/30" : ""
+                    cellContent.filled ? cellContent.color : "bg-tetris-bg"
                   )}
                 />
               );
