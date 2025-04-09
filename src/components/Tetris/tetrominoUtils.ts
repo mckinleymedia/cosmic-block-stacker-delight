@@ -1,4 +1,3 @@
-
 import { ActiveTetromino, Position, GameState, Direction } from './gameTypes';
 import { BOARD_WIDTH } from './gameConstants';
 import { checkCollision } from './boardUtils';
