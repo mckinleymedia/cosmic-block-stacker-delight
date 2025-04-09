@@ -43,7 +43,7 @@ export const createTetromino = (type: TetrominoType): ActiveTetromino => {
 // Move tetromino in a direction if possible
 export const moveTetromino = (
   gameState: GameState,
-  direction: 'LEFT' | 'RIGHT' | 'DOWN' | 'UP' // Added 'UP' for quad mode
+  direction: Direction // Use Direction type directly
 ): { 
   newTetromino: ActiveTetromino | null, 
   collided: boolean 
@@ -96,7 +96,7 @@ export const moveTetromino = (
       },
       collided: false
     };
-  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && (direction === 'UP' || direction === 'DOWN'))) {
+  } else if (direction === 'DOWN' || (gameState.quadMode && tetrominoDirection === 'UP' && direction === 'UP')) {
     return { newTetromino: gameState.activeTetromino, collided: true };
   }
   
