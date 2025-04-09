@@ -31,40 +31,6 @@ const QuadModeStats: React.FC<QuadModeStatsProps> = ({ scores, linesCleared, lev
           <p className="text-lg font-mono">{totalLinesCleared}</p>
         </div>
       </div>
-      
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-        {/* Top - UP direction */}
-        <div className="col-start-2">
-          <div className="flex items-center justify-center">
-            <ChevronUp className="h-4 w-4 mr-1" />
-            <span className="text-xs opacity-60">{linesCleared.up} lines</span>
-          </div>
-        </div>
-        
-        {/* Left side - LEFT direction */}
-        <div className="col-start-1 row-start-2">
-          <div className="flex items-center justify-center">
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            <span className="text-xs opacity-60">{linesCleared.left} lines</span>
-          </div>
-        </div>
-        
-        {/* Right side - RIGHT direction */}
-        <div className="col-start-3 row-start-2">
-          <div className="flex items-center justify-center">
-            <ChevronRight className="h-4 w-4 mr-1" />
-            <span className="text-xs opacity-60">{linesCleared.right} lines</span>
-          </div>
-        </div>
-        
-        {/* Bottom - DOWN direction */}
-        <div className="col-start-2 row-start-3">
-          <div className="flex items-center justify-center">
-            <ChevronDown className="h-4 w-4 mr-1" />
-            <span className="text-xs opacity-60">{linesCleared.down} lines</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
