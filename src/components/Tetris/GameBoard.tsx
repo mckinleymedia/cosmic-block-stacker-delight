@@ -100,9 +100,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  // Render quad mode board (88x88 plus sign shape)
-  const cellSize = "w-[4px] h-[4px] sm:w-[5px] sm:h-[5px]"; // Smaller cells for the larger 88x88 grid
-  const centerSize = 8; // 8x8 center (doubled from previous 4x4)
+  // Render quad mode board (132x132 plus sign shape)
+  const cellSize = "w-[3px] h-[3px] sm:w-[4px] sm:h-[4px]"; // Smaller cells for the larger 132x132 grid
+  const centerSize = 8; // 8x8 center
   
   return (
     <div className={cn(
@@ -137,7 +137,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 );
               }
               
-              // Map the 88x88 grid to the appropriate segments of our 10x20 board
+              // Map the 132x132 grid to the appropriate segments of our 10x20 board
               // Center area (8x8 in the middle)
               if (isCenter) {
                 return (

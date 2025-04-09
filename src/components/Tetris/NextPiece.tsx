@@ -1,14 +1,24 @@
 
 import React from 'react';
 import { TETROMINOS, TetrominoType } from './tetrominos';
+import { Direction } from './gameTypes';
+import { ArrowDown, ArrowUp, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface NextPieceProps {
   nextPiece: TetrominoType;
   showPiece: boolean;
   nextShape: number[][] | null;
+  quadMode?: boolean;
+  nextDirection?: Direction;
 }
 
-const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece, nextShape }) => {
+const NextPiece: React.FC<NextPieceProps> = ({ 
+  nextPiece, 
+  showPiece, 
+  nextShape,
+  quadMode = false,
+  nextDirection
+}) => {
   const tetromino = TETROMINOS[nextPiece];
   
   // Create a 4x4 display grid for all tetrominos
@@ -58,9 +68,31 @@ const NextPiece: React.FC<NextPieceProps> = ({ nextPiece, showPiece, nextShape }
     }
   }
   
+  const getDirectionIcon = () => {
+    if (!quadMode || !nextDirection) return null;
+    
+    switch (nextDirection) {
+      case 'UP':
+        return <ArrowUp className="w-5 h-5 text-white/80" />;
+      case 'DOWN':
+        return <ArrowDown className="w-5 h-5 text-white/80" />;
+      case 'LEFT':
+        return <ArrowLeft className="w-5 h-5 text-white/80" />;
+      case 'RIGHT':
+        return <ArrowRight className="w-5 h-5 text-white/80" />;
+      default:
+        return null;
+    }
+  };
+  
   return (
     <div className="bg-tetris-bg p-4 border-2 border-tetris-border rounded w-full flex flex-col">
-      <h3 className="text-white text-center mb-4 font-bold text-lg">Next</h3>
+      <div className="flex items-center justify-center mb-2">
+        <h3 className="text-white text-center font-bold text-lg">Next</h3>
+        {quadMode && nextDirection && (
+          <div className="ml-2">{getDirectionIcon()}</div>
+        )}
+      </div>
       <div className="flex-grow flex items-center justify-center">
         <div className="grid grid-cols-4 gap-1 mx-auto">
           {displayGrid.map((row, rowIndex) =>

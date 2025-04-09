@@ -3,9 +3,9 @@
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 
-// Quad mode dimensions - doubled from previous 44x44 to 88x88
-export const QUAD_BOARD_SIZE = 88;
-export const QUAD_CENTER_SIZE = 8; // Center size doubled from 4x4 to 8x8
+// Quad mode dimensions - increased by 50% from 88x88 to 132x132
+export const QUAD_BOARD_SIZE = 132;
+export const QUAD_CENTER_SIZE = 8; // Center size (8x8)
 export const QUAD_CENTER_POSITION = {
   x: Math.floor(QUAD_BOARD_SIZE / 2) - Math.floor(QUAD_CENTER_SIZE / 2),
   y: Math.floor(QUAD_BOARD_SIZE / 2) - Math.floor(QUAD_CENTER_SIZE / 2)

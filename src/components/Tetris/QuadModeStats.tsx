@@ -10,7 +10,7 @@ interface QuadModeStatsProps {
 
 const QuadModeStats: React.FC<QuadModeStatsProps> = ({ scores, linesCleared }) => {
   return (
-    <div className="bg-tetris-bg border-2 border-tetris-border rounded p-4 text-white w-full">
+    <div className="bg-tetris-bg border-2 border-tetris-border rounded p-4 text-white flex-grow">
       <h3 className="font-bold text-lg opacity-75 text-center mb-3">Quad Scores</h3>
       
       <div className="grid grid-cols-3 gap-2 text-center">

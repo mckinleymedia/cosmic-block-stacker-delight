@@ -74,7 +74,7 @@ const TetrisGame: React.FC = () => {
   }, [gameState.gameOver]);
   
   return (
-    <div className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center max-w-5xl mx-auto">
+    <div className="flex flex-col gap-4 items-center justify-center max-w-5xl mx-auto">
       <GameBoard 
         board={gameState.board} 
         activeTetromino={gameHasStarted ? gameState.activeTetromino : null}
@@ -84,12 +84,15 @@ const TetrisGame: React.FC = () => {
         onQuit={handleQuit}
       />
       
-      <div className="flex flex-col gap-4 w-full max-w-[200px] mx-auto">
-        <div className={`${gameState.gameOver ? "opacity-50" : ""}`}>
+      {/* Horizontal panel for quad mode, vertical panel for normal mode */}
+      <div className={`flex ${gameState.quadMode ? 'flex-row flex-wrap' : 'flex-col md:flex-row'} gap-4 w-full justify-center`}>
+        <div className={`${gameState.gameOver ? "opacity-50" : ""} ${gameState.quadMode ? "min-w-[150px]" : "max-w-[200px] mx-auto"}`}>
           <NextPiece 
             nextPiece={gameState.nextTetromino} 
             showPiece={gameHasBeenPlayed}
             nextShape={gameState.nextTetrominoShape}
+            quadMode={gameState.quadMode}
+            nextDirection={gameState.quadDirection}
           />
         </div>
         
@@ -106,26 +109,32 @@ const TetrisGame: React.FC = () => {
           />
         )}
         
-        <QuadModeToggle
-          enabled={gameState.quadMode}
-          onToggle={handleQuadModeToggle}
-        />
+        <div className={`${gameState.quadMode ? "min-w-[150px]" : ""}`}>
+          <QuadModeToggle
+            enabled={gameState.quadMode}
+            onToggle={handleQuadModeToggle}
+          />
+        </div>
         
-        <GameControls 
-          onAction={handleGameAction} 
-          isPaused={gameState.isPaused}
-          gameOver={gameState.gameOver}
-          hasActiveTetromino={gameState.activeTetromino !== null}
-        />
+        <div className={`${gameState.quadMode ? "min-w-[150px]" : ""}`}>
+          <GameControls 
+            onAction={handleGameAction} 
+            isPaused={gameState.isPaused}
+            gameOver={gameState.gameOver}
+            hasActiveTetromino={gameState.activeTetromino !== null}
+          />
+        </div>
         
-        <Button 
-          variant="outline" 
-          className="border-tetris-border text-white/70 hover:text-white hover:bg-tetris-border/20 mt-2 bg-[#333333]"
-          onClick={() => setShowLeaderboard(true)}
-        >
-          <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
-          Leaderboard
-        </Button>
+        <div className={`${gameState.quadMode ? "min-w-[150px]" : ""}`}>
+          <Button 
+            variant="outline" 
+            className="border-tetris-border text-white/70 hover:text-white hover:bg-tetris-border/20 bg-[#333333] w-full"
+            onClick={() => setShowLeaderboard(true)}
+          >
+            <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
+            Leaderboard
+          </Button>
+        </div>
       </div>
       
       <ScoreSubmissionDialog
