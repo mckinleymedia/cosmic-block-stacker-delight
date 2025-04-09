@@ -22,10 +22,10 @@ const Index = () => {
         <Button 
           variant="ghost" 
           size="icon"
-          className="absolute right-0 text-white/70 hover:text-white hover:bg-tetris-border/20 bg-transparent"
+          className="ml-20 text-white/70 hover:text-white hover:bg-tetris-border/20 bg-transparent"
           onClick={() => setShowLeaderboard(true)}
         >
-          <Trophy className="h-5 w-5 text-yellow-500" />
+          <Trophy className="h-10 w-10 text-yellow-500" />
           <span className="sr-only">Leaderboard</span>
         </Button>
       </div>
